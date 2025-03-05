@@ -1,0 +1,983 @@
+openapi: 3.0.3
+info:
+  title: Train Catcher - OpenAPI 3.0
+  version: 1.0.11
+  description: >-
+    This is an application designed to integrate with multiple train companies
+    so that users can search for train routes, book their journeys and buy train
+    tickets.
+  contact:
+    email: v.gosa@student.utwente.nl
+    name: Vlad Gosa or Victor Alecu
+tags:
+  - name: train
+    description: Train data of a train operator
+  - name: journey
+    description: Journeys offered by a train operator (from station A to station B with train XYZ)
+  - name: route
+    description: Routes are a collection of journeys that start from the first journey's destination, and end with the last journey's arrival station
+  - name: booking
+    description: Bookings represent a reference to a business process that books seats on a given route for a user
+  - name: ticket
+    description: Tickets represent a confirmation of the purchase of a booking made by a user
+  - name: payment
+    description: Payments represent the trigger of a payment process
+  - name: user
+    description: Accounts of users using the platform
+paths:
+  /train:
+    get:
+      tags:
+        - train
+      summary: Get all trains from a train company
+      description: This endpoint retrieves multiple train objects from a single train company.
+      operationId: getTrains
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Train'
+    post:
+      tags:
+        - train
+      summary: Add a new train to the train company
+      description: Add a new train to the train company. The ID of the entity will be assigned monotonically increasing relative to the last existing entry, regardless of the input value.
+      operationId: addTrain
+      requestBody:
+        description: Create a new train in the train company
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Train'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /train/{trainId}:
+    get:
+      tags:
+        - train
+      summary: Get a single train entity from the train company by trainId
+      description: Get a single train entity from the train company by trainId
+      operationId: getTrainById
+      parameters:
+        - name: trainId
+          in: path
+          example: 10
+          description: ID of train to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'
+        '400':
+          description: Invalid input
+        '404':
+          description: Train not found
+    put:
+      tags:
+        - train
+      summary: Update a train entity from the train company
+      description: Update a train entity from the train company
+      operationId: updateTrain
+      parameters:
+        - name: trainId
+          in: path
+          example: 10
+          description: ID of train that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update a train entity from the train company
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Train'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Train'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+    delete:
+      tags:
+        - train
+      summary: Delete a train entity from the train company
+      description: Delete a train entity from the train company
+      operationId: deleteTrain
+      parameters:
+        - name: trainId
+          example: 10
+          in: path
+          description: ID of train that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+  /journey:
+    get:
+      tags:
+        - journey
+      summary: Find journeys from the train company
+      description: Find one or more journeys from the train company based on departure and arrival stations, time of departure and delay status
+      operationId: findJourneys
+      parameters:
+        - name: departure_station
+          in: query
+          description: Departure station that needs to be considered for filter
+          required: false
+          schema:
+            type: string
+            example: Enschede
+        - name: arrival_station
+          in: query
+          description: Arrival station that needs to be considered for filter
+          required: false
+          schema:
+            type: string
+            example: Amsterdam
+        - name: departure_time
+          in: query
+          description: Departure time that needs to be considered for filter
+          required: false
+          schema:
+            type: string
+            format: date-time
+            example: 2025-03-05T11:59:19.845Z
+        - name: isDelayed
+          in: query
+          description: Delayed status that needs to be considered for filter
+          required: false
+          schema:
+            type: boolean
+            example: false
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Journey'
+    post:
+      tags:
+        - journey
+      summary: Add a new journey to the train company
+      description: Add a new journey to the train company. The ID of the entity will be assigned monotonically increasing relative to the last existing entry, regardless of the input value.
+      operationId: addJourney
+      requestBody:
+        description: Create a new journey in the train company
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Journey'
+        required: True
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /journey/{journeyId}:
+    get:
+      tags:
+        - journey
+      summary: Get a single journey entity from the train company by journeyId
+      description: Get a single journey entity from the train company by journeyId
+      operationId: getJourneyById
+      parameters:
+        - name: journeyId
+          in: path
+          example: 10
+          description: ID of train to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '400':
+          description: Invalid input
+        '404':
+          description: Journey not found
+    put:
+      tags:
+        - journey
+      summary: Update a journey entity from the train company
+      description: Update a journey entity from the train company
+      operationId: updateJourney
+      parameters:
+        - name: journeyId
+          in: path
+          example: 10
+          description: ID of journey that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update a journey entity from the train company
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Journey'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Journey'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+    delete:
+      tags:
+        - journey
+      summary: Delete a journey entity from the train company
+      description: Delete a journey entity from the train company
+      operationId: deleteJourney
+      parameters:
+        - name: journeyId
+          example: 10
+          in: path
+          description: ID of journey that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+  /route:
+    get:
+      tags:
+        - route
+      summary: Get a list of routes composed of an array of journeys gathered from all train companies
+      description: Get a list of routes composed of an array of journeys gathered from all train companies, between the given departure and arrival stations, starting from the departure time
+      operationId: findRoutes
+      parameters:
+        - name: departure_station
+          in: query
+          description: Departure station that needs to be considered for creating a route
+          required: true
+          schema:
+            type: string
+            example: Enschede
+        - name: arrival_station
+          in: query
+          description: Arrival station that needs to be considered for creating a route
+          required: true
+          schema:
+            type: string
+            example: Amsterdam
+        - name: departure_time
+          in: query
+          description: Departure time that needs to be considered for creating a route
+          required: true
+          schema:
+            type: string
+            format: date-time
+            example: 2025-03-05T11:59:19.845Z
+        - name: fetchDelayed
+          in: query
+          description: Whether to fetch delayed journeys in the routes or not
+          required: false
+          schema:
+            type: boolean
+            default: false
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Journey'
+  /booking:
+    post:
+      tags:
+        - booking
+      summary: Create a booking for a given route and userId
+      description: Create a booking for a given route and userId
+      operationId: createBooking
+      parameters:
+        - name: userId
+          in: query
+          description: UserId to which the booking is linked
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/Journey'
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /booking/{bookingId}:
+    get:
+      tags:
+        - booking
+      summary: Get a booking based on a bookingId
+      description: Get a booking based on a bookingId
+      operationId: getBookingByID
+      parameters:
+        - name: bookingId
+          in: path
+          description: Booking ID of the requested booking
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+        '404':
+          description: Booking not found
+    put:
+      tags:
+          - booking
+      summary: Update a booking entity
+      description: Update a booking entity
+      operationId: updateBooking
+      parameters:
+        - name: bookingId
+          in: path
+          example: 10
+          description: ID of booking that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update a booking entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+    delete:
+      tags:
+        - booking
+      summary: Delete a booking entity
+      description: Delete a booking entity
+      operationId: deleteBooking
+      parameters:
+        - name: bookingId
+          example: 10
+          in: path
+          description: ID of booking that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+  /ticket:
+   post:
+      tags:
+        - ticket
+      summary: Create a ticket for a given userId and bookingId
+      description: Create a ticket for a given userId and bookingId
+      operationId: createTicket
+      parameters:
+        - name: userId
+          in: query
+          description: userId to which the booking is linked
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 10
+        - name: bookingId
+          in: query
+          description: bookingId to which the booking is linked
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /ticket/{ticketId}:
+    get:
+      tags:
+        - ticket
+      summary: Get a ticket based on a ticketId
+      description: Get a ticket based on a ticketId
+      operationId: getTicketByID
+      parameters:
+        - name: ticketId
+          in: path
+          description: Ticket ID of the requested ticket
+          required: true
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Invalid input
+        '404':
+          description: Ticket not found
+    put:
+      tags:
+          - ticket
+      summary: Update a ticket entity
+      description: Update a ticket entity
+      operationId: updateTicket
+      parameters:
+        - name: ticketId
+          in: path
+          example: 10
+          description: ID of ticket that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update a ticket entity
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Ticket'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+    delete:
+      tags:
+        - ticket
+      summary: Delete a ticket entity
+      description: Delete a ticket entity
+      operationId: deleteTicket
+      parameters:
+        - name: ticketId
+          example: 10
+          in: path
+          description: ID of ticket that needs to be deleted
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+  /payment/{paymentId}:
+    get:
+      tags:
+        - payment
+      summary: Find a payment by PaymentId
+      description: Find a payment by PaymentId
+      operationId: findPaymentById
+      parameters:
+        - name: paymentId
+          in: path
+          description: ID of the payment
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid input
+        '404':
+          description: Payment not found
+  /payment/{method}:
+    post:
+      tags:
+        - payment
+      summary: Issue a payment with a given method
+      description: Issue a payment for a particular service (i.e. ordering a ticket)
+      operationId: createPayment
+      parameters:
+        - name: method
+          in: path
+          description: Supported payment method
+          required: true
+          schema:
+            type: string
+            enum: [debit, ideal]
+        - name: bookingId
+          in: query
+          description: Booking ID for which to pay
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Payment'
+        '400':
+          description: Invalid input or payment did not succeed
+  /user:
+    post:
+      tags:
+        - user
+      summary: Create user
+      description: This can only be done by the logged in user.
+      operationId: createUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+  /user/createWithList:
+    post:
+      tags:
+        - user
+      summary: Creates list of users with given input array
+      description: Creates list of users with given input array
+      operationId: createUsersWithListInput
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        default:
+          description: successful operation
+  /user/login:
+    get:
+      tags:
+        - user
+      summary: Logs user into the system
+      description: ''
+      operationId: loginUser
+      parameters:
+        - name: email
+          in: query
+          description: The email for login
+          required: false
+          schema:
+            type: string
+        - name: password
+          in: query
+          description: The password for login in clear text
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          headers:
+            X-Rate-Limit:
+              description: calls per hour allowed by the user
+              schema:
+                type: integer
+                format: int32
+            X-Expires-After:
+              description: date in UTC when token expires
+              schema:
+                type: string
+                format: date-time
+          content:
+            application/json:
+              schema:
+                type: string
+        '400':
+          description: Invalid email/password supplied
+  /user/logout:
+    get:
+      tags:
+        - user
+      summary: Logs out current logged in user session
+      description: ''
+      operationId: logoutUser
+      parameters: []
+      responses:
+        default:
+          description: successful operation
+  /user/{email}:
+    get:
+      tags:
+        - user
+      summary: Get user by email
+      description: ''
+      operationId: getUserByEmail
+      parameters:
+        - name: email
+          in: path
+          description: 'The email that needs to be fetched. Use user@email.com for testing. '
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid email supplied
+        '404':
+          description: User not found
+    put:
+      tags:
+        - user
+      summary: Update user
+      description: This can only be done by the logged in user.
+      operationId: updateUser
+      parameters:
+        - name: email
+          in: path
+          description: user that needs to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Update an existent user in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        default:
+          description: successful operation
+    delete:
+      tags:
+        - user
+      summary: Delete user
+      description: This can only be done by the logged in user.
+      operationId: deleteUser
+      parameters:
+        - name: email
+          in: path
+          description: The user that needs to be deleted
+          required: true
+          schema:
+            type: string
+      responses:
+        '400':
+          description: Invalid email supplied
+        '404':
+          description: User not found
+          
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        password:
+          type: string
+          example: 'VeryStrongPassword123!'
+        phone:
+          type: string
+          example: '+40770312595'
+        balance:
+          type: number
+          description: In-account credit balance for buying tickets
+          example: 121.33
+    Train:
+      required:
+        - id
+        - name
+        - seats
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          minimum: 0
+        name:
+          type: string
+          example: Bombardier-123
+        seats:
+          type: integer
+          format: int32
+          example: 120
+          minimum: 0
+    Journey:
+      required:
+        - id
+        - train_id
+        - departure_station
+        - arrival_station
+        - departure_time
+        - travel_time
+        - price
+        - occupied_seats
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 5
+          minimum: 0
+        train_id:
+          type: integer
+          format: int64
+          example: 10
+          minimum: 0
+        departure_station:
+          type: string
+          example: Enschede
+        arrival_station:
+          type: string
+          example: Amsterdam
+        departure_time:
+          type: string
+          format: date-time
+        travel_time:
+          type: integer
+          format: int32
+          minimum: 0
+          example: 120
+          description: time in whole minutes
+        price:
+          type: number
+          minimum: 0
+          example: 15.99
+        occupied_seats:
+          type: integer
+          format: int32
+          example: 32
+          minimum: 0
+    Booking:
+      required:
+        - id
+        - user_id
+        - route
+        - price
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          minimum: 0
+        user_id:
+          type: integer
+          format: int64
+          example: 10
+          minimum: 0
+        route:
+          type: array
+          items:
+            $ref: '#/components/schemas/Journey'
+        price:
+          type: number
+          minimum: 0
+          example: 31.99
+          description: Total price of the journeys listed in the booking
+    Ticket:
+      required:
+        - id
+        - user_id
+        - booking_id
+        - isValid
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          minimum: 0
+        user_id:
+          type: integer
+          format: int64
+          example: 100
+          minimum: 0
+        booking_id:
+          type: integer
+          format: int64
+          example: 69
+          minimum: 0
+        isValid:
+          type: boolean
+          example: true
+          default: true
+          description: Validity of the ticket. Can be invalidated if a BProcess demands it.
+    Payment:
+      required:
+        - id
+        - user_id
+        - booking_id
+        - isSuccess
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 1
+          minimum: 0
+        user_id:
+          type: integer
+          format: int64
+          example: 100
+          minimum: 0
+        booking_id:
+          type: integer
+          format: int64
+          example: 69
+          minimum: 0
+        isSuccess:
+          type: boolean
+          example: true
+          default: false

@@ -1,5 +1,9 @@
 package org.group21.trainoperator.controller;
 
+import jakarta.persistence.*;
+import org.group21.trainoperator.model.*;
+import org.group21.trainoperator.service.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,38 +13,47 @@ import java.util.*;
 @RequestMapping("/journey")
 public class JourneyController {
 
+    private final JourneyService journeyService;
+
+    public JourneyController(JourneyService journeyService) {
+        this.journeyService = journeyService;
+    }
+
     @GetMapping
-    public ResponseEntity<List<Object>> findJourneys(
+    public ResponseEntity<List<Journey>> findJourneys(
             @RequestParam(value = "departure_station", required = false) String departureStation,
             @RequestParam(value = "arrival_station", required = false) String arrivalStation,
             @RequestParam(value = "departure_time", required = false) String departureTime,
             @RequestParam(value = "isDelayed", required = false) Boolean isDelayed) {
-        // TODO: Implement logic to find journeys based on query parameters
-        return ResponseEntity.ok().build();
+        // For now, we return all journeys.
+        // You can add filtering logic here using the parameters.
+        List<Journey> journeys = journeyService.getAllJourneys();
+        return ResponseEntity.ok(journeys);
     }
 
     @PostMapping
-    public ResponseEntity<Object> addJourney(@RequestBody Object journey) {
-        // TODO: Add a new journey and return the created journey object
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Journey> addJourney(@RequestBody Journey journey) {
+        Journey createdJourney = journeyService.addJourney(journey);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdJourney);
     }
 
     @GetMapping("/{journeyId}")
-    public ResponseEntity<Object> getJourneyById(@PathVariable("journeyId") Long journeyId) {
-        // TODO: Retrieve and return a journey by its ID
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Journey> getJourneyById(@PathVariable("journeyId") Integer journeyId) {
+        Optional<Journey> journeyOpt = journeyService.getJourneyById(journeyId);
+        return journeyOpt.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{journeyId}")
-    public ResponseEntity<Object> updateJourney(@PathVariable("journeyId") Long journeyId,
-                                                @RequestBody Object journey) {
-        // TODO: Update and return the journey with the given ID
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Journey> updateJourney(@PathVariable("journeyId") Integer journeyId,
+                                                 @RequestBody Journey journey) {
+        Journey updatedJourney = journeyService.updateJourney(journeyId, journey);
+        return ResponseEntity.ok(updatedJourney);
     }
 
     @DeleteMapping("/{journeyId}")
-    public ResponseEntity<Void> deleteJourney(@PathVariable("journeyId") Long journeyId) {
-        // TODO: Delete the journey with the given ID
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> deleteJourney(@PathVariable("journeyId") Integer journeyId) {
+        journeyService.deleteJourney(journeyId);
+        return ResponseEntity.noContent().build();
     }
 }

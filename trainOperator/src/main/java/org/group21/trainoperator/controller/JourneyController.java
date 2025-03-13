@@ -25,9 +25,9 @@ public class JourneyController {
             @RequestParam(value = "arrival_station", required = false) String arrivalStation,
             @RequestParam(value = "departure_time", required = false) String departureTime,
             @RequestParam(value = "isDelayed", required = false) Boolean isDelayed) {
-        // For now, we return all journeys.
-        // You can add filtering logic here using the parameters.
-        List<Journey> journeys = journeyService.getAllJourneys();
+
+        // For now, we ignore isDelayed as it's not implemented.
+        List<Journey> journeys = journeyService.getFilteredJourneys(departureStation, arrivalStation, departureTime);
         return ResponseEntity.ok(journeys);
     }
 

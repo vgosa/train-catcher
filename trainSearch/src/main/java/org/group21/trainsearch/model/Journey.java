@@ -4,11 +4,9 @@ import lombok.*;
 
 import java.time.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 public class Journey {
-    private Integer id;
+    private Long id;
     private String departureStation;
     private String arrivalStation;
     private LocalDateTime departureTime;

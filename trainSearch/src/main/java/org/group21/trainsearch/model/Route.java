@@ -9,7 +9,7 @@ import java.util.*;
 public class Route {
     private List<Journey> journeys;
     private double totalPrice;
-    private int totalDuration;
+    private int totalDuration; // minutes
 
     public Route(List<Journey> journeys) {
         this.journeys = journeys;

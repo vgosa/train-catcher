@@ -37,11 +37,9 @@ public class TrainSearchService {
             String url = operator.getUrl() + "/journey"; // no filters appended
             try {
                 Journey[] journeys = restTemplate.getForObject(url, Journey[].class);
-                if (journeys != null) {
-                    for (Journey journey : journeys) {
-                        journey.setOperator(operator);
-                        allJourneys.add(journey);
-                    }
+                for (Journey journey : journeys) {
+                    journey.setOperator(operator);
+                    allJourneys.add(journey);
                 }
             } catch (Exception e) {
                 System.err.println("Error querying operator " + operator.getUrl() + ": " + e.getMessage());

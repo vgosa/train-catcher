@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.*;
 
 import java.util.*;
 
-public interface JourneyRepository extends JpaRepository<Journey, Integer>, JpaSpecificationExecutor<Journey> {
+public interface JourneyRepository extends JpaRepository<Journey, Long>, JpaSpecificationExecutor<Journey> {
     List<Journey> findAll(@Nullable Specification<Journey> spec);
 }

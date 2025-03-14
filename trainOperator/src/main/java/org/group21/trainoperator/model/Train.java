@@ -6,14 +6,22 @@ import lombok.*;
 @Entity
 @Table(name = "train")
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @Getter
 @Setter
 public class Train {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "seats", nullable = false)
     private Integer seats;
+
+    public Train (String name, Integer seats) {
+        this.name = name;
+        this.seats = seats;
+    }
 }

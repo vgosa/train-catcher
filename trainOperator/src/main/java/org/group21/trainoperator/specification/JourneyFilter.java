@@ -1,7 +1,9 @@
 package org.group21.trainoperator.specification;
 
 import lombok.*;
+import org.springframework.cglib.core.Local;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Setter

@@ -21,7 +21,7 @@ public class JourneySpecification {
         return Specification
                 .where(hasDepartureStation(filter.getDepartureStation()))
                 .and(hasArrivalStation(filter.getArrivalStation()))
-                .and(hasDepartureTime(filter.getDepartureTime()));
+                .and(hasDepartureTimeGreaterThanOrEqualTo(filter.getDepartureTime()));
     }
 
     private static Specification<Journey> hasDepartureStation(String departureStation) {
@@ -43,5 +43,12 @@ public class JourneySpecification {
                 (departureTime == null)
                         ? cb.conjunction()
                         : cb.equal(root.get(DEPARTURE_TIME), departureTime);
+    }
+
+    private static Specification<Journey> hasDepartureTimeGreaterThanOrEqualTo(LocalDateTime departureTime) {
+        return (root, query, cb) ->
+                (departureTime == null)
+                    ? cb.conjunction()
+                    : cb.greaterThanOrEqualTo(root.get(DEPARTURE_TIME), departureTime);
     }
 }

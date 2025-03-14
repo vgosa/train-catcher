@@ -20,20 +20,21 @@ public class TrainService {
         return trainRepository.findAll();
     }
 
-    public Optional<Train> getTrainById(Integer id) {
+    public Optional<Train> getTrainById(Long id) {
         return trainRepository.findById(id);
     }
 
     public Train addTrain(Train train) {
+        train.setId(null); // Auto-generated ID
         return trainRepository.save(train);
     }
 
-    public Train updateTrain(Integer id, Train train) {
+    public Train updateTrain(Long id, Train train) {
         train.setId(id);
         return trainRepository.save(train);
     }
 
-    public void deleteTrain(Integer id) {
+    public void deleteTrain(Long id) {
         trainRepository.deleteById(id);
     }
 }

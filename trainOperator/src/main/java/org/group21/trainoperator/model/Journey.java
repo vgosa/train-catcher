@@ -13,7 +13,8 @@ import java.time.*;
 @Setter
 public class Journey {
     @Id
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "train_id", nullable = false)

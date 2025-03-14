@@ -3,6 +3,7 @@ package org.group21.trainoperator.service;
 import org.group21.trainoperator.model.Journey;
 import org.group21.trainoperator.repository.JourneyRepository;
 import org.group21.trainoperator.specification.*;
+import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
 import java.time.*;
@@ -18,17 +19,7 @@ public class JourneyService {
         this.journeyRepository = journeyRepository;
     }
 
-    public List<Journey> getFilteredJourneys(String departureStation, String arrivalStation, String departureTimeStr) {
-        LocalDateTime departureTime = null;
-        if (departureTimeStr != null && !departureTimeStr.isEmpty()) {
-            try {
-                departureTime = LocalDateTime.parse(departureTimeStr);
-            } catch (Exception e) {
-                // Alternatively, handle the parse error (e.g., throw an exception or return an empty list)
-                throw new IllegalArgumentException("Invalid date format for departureTime. Expected ISO_LOCAL_DATE_TIME format.");
-            }
-        }
-
+    public List<Journey> getFilteredJourneys(String departureStation, String arrivalStation, LocalDateTime departureTime) {
         JourneyFilter filter = new JourneyFilter(departureStation, arrivalStation, departureTime);
         return journeyRepository.findAll(JourneySpecification.filterBy(filter));
     }
@@ -38,20 +29,20 @@ public class JourneyService {
         return journeyRepository.findAll();
     }
 
-    public Optional<Journey> getJourneyById(Integer id) {
+    public Optional<Journey> getJourneyById(Long id) {
         return journeyRepository.findById(id);
     }
 
     public Journey addJourney(Journey journey) {
+        journey.setId(null);
         return journeyRepository.save(journey);
     }
 
-    public Journey updateJourney(Integer id, Journey journey) {
-        journey.setId(id);
+    public Journey updateJourney(Long id, Journey journey) {
         return journeyRepository.save(journey);
     }
 
-    public void deleteJourney(Integer id) {
+    public void deleteJourney(Long id) {
         journeyRepository.deleteById(id);
     }
 }

@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: trainSearch
+  config:
+    import: "consul:"
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        healthCheckInterval: 1s
+        healthCheckPath: /actuator/health
+        instance-id: ${spring.application.name}:${random.value}
+        queryPassing: true
+        preferIpAddress: true
+        enabled: true
+server:
+  port: 8080

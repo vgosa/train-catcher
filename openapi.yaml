@@ -14,8 +14,8 @@ tags:
     description: Train data of a train operator
   - name: journey
     description: Journeys offered by a train operator (from station A to station B with train XYZ)
-  - name: route
-    description: Routes are a collection of journeys that start from the first journey's destination, and end with the last journey's arrival station
+  - name: search
+    description: Searching is a business process involving the search and aggregation of train journeys (into routes).Routes are a collection of journeys that start from the first journey's destination, and end with the last journey's arrival station
   - name: booking
     description: Bookings represent a reference to a business process that books seats on a given route for a user
   - name: ticket
@@ -55,7 +55,7 @@ paths:
               $ref: '#/components/schemas/Train'
         required: true
       responses:
-        '200':
+        '201':
           description: Successful operation
           content:
             application/json:
@@ -141,7 +141,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
           description: Invalid input
@@ -205,7 +205,7 @@ paths:
               $ref: '#/components/schemas/Journey'
         required: True
       responses:
-        '200':
+        '201':
           description: Successful operation
           content:
             application/json:
@@ -291,14 +291,14 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
           description: Invalid input
-  /route:
+  /search/routes:
     get:
       tags:
-        - route
+        - search
       summary: Get a list of routes composed of an array of journeys gathered from all train companies
       description: Get a list of routes composed of an array of journeys gathered from all train companies, between the given departure and arrival stations, starting from the departure time
       operationId: findRoutes
@@ -366,7 +366,7 @@ paths:
               items:
                 $ref: '#/components/schemas/Journey'
       responses:
-        '200':
+        '201':
             description: successful operation
             content:
               application/json:
@@ -454,7 +454,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
           description: Invalid input
@@ -489,7 +489,7 @@ paths:
             schema:
               $ref: '#/components/schemas/Ticket'
       responses:
-        '200':
+        '201':
             description: successful operation
             content:
               application/json:
@@ -577,7 +577,7 @@ paths:
             type: integer
             format: int64
       responses:
-        '200':
+        '204':
           description: Successful operation
         '400':
           description: Invalid input
@@ -656,7 +656,7 @@ paths:
             schema:
               $ref: '#/components/schemas/User'
       responses:
-        default:
+        '201':
           description: successful operation
           content:
             application/json:
@@ -677,7 +677,7 @@ paths:
               items:
                 $ref: '#/components/schemas/User'
       responses:
-        '200':
+        '201':
           description: Successful operation
           content:
             application/json:
@@ -800,6 +800,8 @@ paths:
           schema:
             type: string
       responses:
+        '204':
+          description: Successful operation
         '400':
           description: Invalid email supplied
         '404':

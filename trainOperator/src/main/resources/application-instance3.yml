@@ -1,13 +1,15 @@
 spring:
   application:
-    name: trainOperator1
+    name: trainOperator3
+  config:
+    import: "consul:"
   cloud:
     consul:
       host: localhost
       port: 8500
       discovery:
         healthCheckInterval: 1s
-        healthCheckPath: ${server.servlet.context-path}/actuator/health
+        healthCheckPath: /actuator/health
         instance-id: ${spring.application.name}:${random.value}
         queryPassing: true
         preferIpAddress: true

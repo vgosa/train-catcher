@@ -10,10 +10,15 @@ import java.util.concurrent.*;
 @Getter
 @Service
 public class OperatorService {
+
+    private static final String OPERATOR_SERVICE_ID = "trainOperator";
+
+    public static final String OPERATOR_JOURNEY_ENDPOINT = "/journey";
+
     private final List<Operator> operators = new CopyOnWriteArrayList<>(
             Arrays.asList(
-                    new Operator("Operator 1", "http://localhost:8090"),
-                    new Operator("Operator 2", "http://localhost:8091")
+                    new Operator("Operator 1", String.format("http://%s%d", OPERATOR_SERVICE_ID, 1)),
+                    new Operator("Operator 2", String.format("http://%s%d", OPERATOR_SERVICE_ID, 2))
             )
     );
 

@@ -2,6 +2,7 @@ package org.group21.trainsearch.service;
 
 import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.util.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
@@ -14,9 +15,10 @@ public class TrainSearchService {
     private final OperatorService operatorService;
     private final RestTemplate restTemplate; // You might switch to WebClient for asynchronous calls
 
-    public TrainSearchService(OperatorService operatorService) {
+    @Autowired
+    public TrainSearchService(OperatorService operatorService, RestTemplate restTemplate) {
         this.operatorService = operatorService;
-        this.restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate;
     }
 
     /**
@@ -34,14 +36,14 @@ public class TrainSearchService {
         List<Journey> allJourneys = new ArrayList<>();
 
         for (Operator operator : operatorService.getOperators()) {
-            String url = operator.getUrl() + "/journey"; // no filters appended
+            String url = operator.getUrl() + OperatorService.OPERATOR_JOURNEY_ENDPOINT; // no filters appended
             try {
                 Journey[] journeys = restTemplate.getForObject(url, Journey[].class);
                 for (Journey journey : journeys) {
                     journey.setOperator(operator);
                     allJourneys.add(journey);
                 }
-            } catch (Exception e) {
+            } catch (RestClientException e) {
                 System.err.println("Error querying operator " + operator.getUrl() + ": " + e.getMessage());
             }
         }

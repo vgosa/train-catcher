@@ -1,20 +1,22 @@
 package org.group21.notification.listener;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.*;
+import jakarta.jms.JMSRuntimeException;
+import lombok.extern.slf4j.Slf4j;
 import org.group21.notification.model.*;
 import org.group21.notification.service.EmailService;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.annotation.JmsListener;
+import org.springframework.mail.MailException;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
 public class JourneyNotificationListener {
 
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
-
-    @Value("${queue.journey}")
-    private String journeyQueue;
 
     public JourneyNotificationListener(EmailService emailService, ObjectMapper objectMapper) {
         this.emailService = emailService;
@@ -28,8 +30,12 @@ public class JourneyNotificationListener {
             String subject = "Journey Notification for " + notification.getPassenger();
             String body = createNotificationEmailBody(notification);
             emailService.sendEmail(notification.getEmail(), subject, body);
+        } catch (MailException e) {
+            log.error("Error processing journey notification. CAUSE: Could not send the email confirmation!");
+        } catch (JsonProcessingException e) {
+            log.error("Error processing journey notification. CAUSE: Could not read the dequeued message!");
         } catch (Exception e) {
-            System.err.println("Error processing journey notification: " + e.getMessage());
+            log.error("Error processing journey notification.", e);
         }
     }
 

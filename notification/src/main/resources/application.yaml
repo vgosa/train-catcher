@@ -1,0 +1,47 @@
+spring:
+  activemq:
+    broker-url: tcp://localhost:61616
+  application:
+    name: notificationService
+  config:
+    import: "consul:"
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        healthCheckInterval: 1s
+        healthCheckPath: /actuator/health
+        instance-id: ${spring.application.name}:${random.value}
+        queryPassing: true
+        preferIpAddress: true
+        enabled: true
+  mail:
+    host: localhost
+    port: 1025
+    username: ""
+    password: ""
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
+
+activemq:
+  broker-username: admin
+  broker-password: admin
+  redelivery:
+    delay: 500
+
+queue:
+  ticket: ticket
+  journey: journey
+
+management:
+  health:
+    mail:
+      enabled: false
+
+server:
+  port: 8095

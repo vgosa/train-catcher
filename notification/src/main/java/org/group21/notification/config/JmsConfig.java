@@ -13,7 +13,6 @@ import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
 @Configuration
 @Slf4j
 public class JmsConfig {
-//TODO: Configure JMS to retry emails if the email server is down!
 
     @Value("${spring.activemq.broker-url}")
     private String brokerUrl;
@@ -27,36 +26,29 @@ public class JmsConfig {
     @Value("${activemq.redelivery.delay}")
     private long redeliveryDelay;
 
-
-    public JmsConfig() {
-
-    }
-
     @Bean
     public ActiveMQConnectionFactory activeMQConnectionFactory() {
-        ActiveMQConnectionFactory activeMQConnectionFactory = new ActiveMQConnectionFactory();
-
-        activeMQConnectionFactory.setBrokerURL(brokerUrl);
-
+        ActiveMQConnectionFactory connectionFactory = new ActiveMQConnectionFactory();
+        connectionFactory.setBrokerURL(brokerUrl);
         log.info("Connect to ActiveMQ host: {}", brokerUrl);
 
-        if (brokerUsername != null && !brokerUsername.isEmpty() && brokerPassword != null && !brokerPassword.isEmpty()) {
-            activeMQConnectionFactory.setUserName(brokerUsername);
-            activeMQConnectionFactory.setPassword(brokerPassword);
+        if (brokerUsername != null && !brokerUsername.isEmpty() &&
+                brokerPassword != null && !brokerPassword.isEmpty()) {
+            connectionFactory.setUserName(brokerUsername);
+            connectionFactory.setPassword(brokerPassword);
         }
 
-        configureDeliveryPolicy(activeMQConnectionFactory.getRedeliveryPolicy());
-
-        return activeMQConnectionFactory;
+        configureDeliveryPolicy(connectionFactory.getRedeliveryPolicy());
+        return connectionFactory;
     }
 
     @Bean
     public DefaultJmsListenerContainerFactory jmsListenerContainerFactory() {
         DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
         factory.setConnectionFactory(activeMQConnectionFactory());
-        factory.setErrorHandler((e) -> {
-            log.error("An error occured while processing a MQ message", e);
-        });
+        // Enable transacted session so that exceptions result in rollback.
+        factory.setSessionTransacted(true);
+        factory.setErrorHandler(e -> log.error("An error occurred while processing a MQ message", e));
         return factory;
     }
 

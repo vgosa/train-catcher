@@ -14,5 +14,27 @@ spring:
         queryPassing: true
         preferIpAddress: true
         enabled: true
+  datasource:
+    url: jdbc:h2:mem:camunda;DB_CLOSE_ON_EXIT=false
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+restTemplate:
+  connectTimeout: 5
+  readTimeout: 5
+
+camunda:
+    bpm:
+      generic-properties:
+        properties:
+          enforceHistoryTimeToLive: false
+      admin-user:
+        id: demo
+        password: demo
+      filter:
+        create: All
+      license-file: file:${user.home}/.camunda/license.txt
 server:
   port: 8089
+

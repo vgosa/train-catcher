@@ -2,10 +2,13 @@ package org.group21.trainsearch.model;
 
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.*;
 
 @Data
-public class Journey {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Journey implements Serializable {
     private Long id;
     private String departureStation;
     private String arrivalStation;

@@ -1,5 +1,6 @@
 package org.group21.trainsearch.service;
 
+import org.group21.trainsearch.camunda.TicketOrderWorkflow;
 import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,11 +14,14 @@ import java.util.*;
 public class TrainSearchService {
 
     private final OperatorService operatorService;
+
+    private final TicketOrderWorkflow ticketOrderWorkflow;
     private final RestTemplate restTemplate; // You might switch to WebClient for asynchronous calls
 
     @Autowired
-    public TrainSearchService(OperatorService operatorService, RestTemplate restTemplate) {
+    public TrainSearchService(OperatorService operatorService, TicketOrderWorkflow ticketOrderWorkflow, RestTemplate restTemplate) {
         this.operatorService = operatorService;
+        this.ticketOrderWorkflow = ticketOrderWorkflow;
         this.restTemplate = restTemplate;
     }
 
@@ -49,5 +53,9 @@ public class TrainSearchService {
         }
 
         return RouteAggregator.aggregateRoutes(allJourneys, departureStation, arrivalStation, departureTime, maxChanges);
+    }
+
+    public void testCamunda(long userId, Route route) {
+        ticketOrderWorkflow.startTicketOrderWorkflow(userId, route);
     }
 }

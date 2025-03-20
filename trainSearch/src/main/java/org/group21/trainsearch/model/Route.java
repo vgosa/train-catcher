@@ -1,14 +1,27 @@
 package org.group21.trainsearch.model;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.List;
 
 @Getter
 @Setter
-public class Route {
+@NoArgsConstructor
+@AllArgsConstructor
+public class Route implements Serializable {
+    @JsonProperty("journeys")
     private List<Journey> journeys;
+
+    @JsonProperty("totalPrice")
     private double totalPrice;
+
+    @JsonProperty("totalDuration")
     private int totalDuration; // minutes
 
     public Route(List<Journey> journeys) {

@@ -5,6 +5,7 @@ import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.service.*;
 import org.springframework.format.annotation.*;
 import org.springframework.http.*;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.*;

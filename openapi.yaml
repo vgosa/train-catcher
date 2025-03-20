@@ -640,6 +640,23 @@ paths:
         '400':
           description: Invalid input or payment did not succeed
   /user:
+    get:
+      tags:
+        - user
+      summary: Get all users
+      description: Retrieve a list of all users.
+      operationId: getAllUsers
+      responses:
+        '200':
+          description: Successful operation, returns a list of users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '404':
+          description: No users found
     post:
       tags:
         - user
@@ -686,36 +703,37 @@ paths:
         default:
           description: successful operation
   /user/login:
-    get:
+    post:
       tags:
         - user
       summary: Logs user into the system
       description: ''
       operationId: loginUser
-      parameters:
-        - name: email
-          in: query
-          description: The email for login
-          required: false
-          schema:
-            type: string
-        - name: password
-          in: query
-          description: The password for login in clear text
-          required: false
-          schema:
-            type: string
+      requestBody:
+        description: User credentials for login
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: The email for login
+                password:
+                  type: string
+                  description: The password for login in clear text
       responses:
         '200':
-          description: successful operation
+          description: Successful operation. Returns the user id.
           headers:
             X-Rate-Limit:
-              description: calls per hour allowed by the user
+              description: Calls per hour allowed by the user
               schema:
                 type: integer
                 format: int32
             X-Expires-After:
-              description: date in UTC when token expires
+              description: Date in UTC when token expires
               schema:
                 type: string
                 format: date-time
@@ -723,42 +741,50 @@ paths:
             application/json:
               schema:
                 type: string
+                description: The id of the user as a string.
+                example: "123"
         '400':
           description: Invalid email/password supplied
   /user/logout:
-    get:
+    post:
       tags:
         - user
       summary: Logs out current logged in user session
       description: ''
       operationId: logoutUser
-      parameters: []
+      requestBody:
+        description: Logout request (may be empty or include token if needed)
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         default:
-          description: successful operation
-  /user/{email}:
+          description: Successful operation
+  /user/{id}:
     get:
       tags:
         - user
-      summary: Get user by email
+      summary: Get user by id
       description: ''
-      operationId: getUserByEmail
+      operationId: getUserById
       parameters:
-        - name: email
+        - name: id
           in: path
-          description: 'The email that needs to be fetched. Use user@email.com for testing. '
+          description: 'The id of the user that needs to be fetched.'
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '200':
-          description: successful operation
+          description: Successful operation
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
         '400':
-          description: Invalid email supplied
+          description: Invalid id supplied
         '404':
           description: User not found
     put:
@@ -768,12 +794,12 @@ paths:
       description: This can only be done by the logged in user.
       operationId: updateUser
       parameters:
-        - name: email
+        - name: id
           in: path
-          description: user that needs to be updated
+          description: ID of the user that needs to be updated
           required: true
           schema:
-            type: string
+            type: integer
       requestBody:
         description: Update an existent user in the store
         content:
@@ -785,7 +811,7 @@ paths:
               $ref: '#/components/schemas/User'
       responses:
         default:
-          description: successful operation
+          description: Successful operation
     delete:
       tags:
         - user
@@ -793,20 +819,21 @@ paths:
       description: This can only be done by the logged in user.
       operationId: deleteUser
       parameters:
-        - name: email
+        - name: id
           in: path
-          description: The user that needs to be deleted
+          description: The user ID that needs to be deleted
           required: true
           schema:
-            type: string
+            type: integer
       responses:
         '204':
           description: Successful operation
         '400':
-          description: Invalid email supplied
+          description: Invalid id supplied
         '404':
           description: User not found
-          
+
+
 components:
   schemas:
     User:

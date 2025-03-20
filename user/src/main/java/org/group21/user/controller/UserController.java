@@ -32,7 +32,7 @@ public class UserController {
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest){
         // For simplicity, no session management is implemented yet
         try{
-            Integer response = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+            Long response = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
             return ResponseEntity.ok(response.toString());
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
@@ -46,7 +46,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUserById(@PathVariable("id") Integer id) {
+    public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
@@ -62,7 +62,7 @@ public class UserController {
 
 
     @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") Integer id, @RequestBody User user){
+    public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user){
         try {
             User updated = userService.updateUser(id, user);
             return ResponseEntity.ok(updated);
@@ -73,7 +73,7 @@ public class UserController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Integer id){
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
         try {
             userService.deleteUserById(id);
             System.out.println(userService.getAllUsers());

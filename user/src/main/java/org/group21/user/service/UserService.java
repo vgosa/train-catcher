@@ -27,7 +27,7 @@ public class UserService {
         return userRepository.findByEmailIgnoreCase(email);
     }
 
-    public Optional<User> getUserById(Integer id) {
+    public Optional<User> getUserById(Long id) {
         return userRepository.findById(id);
     }
 
@@ -35,7 +35,7 @@ public class UserService {
         return userRepository.findAll();
     }
 
-    public User updateUser(Integer id, User updatedUser) {
+    public User updateUser(Long id, User updatedUser) {
         return userRepository.findById(id)
                 .map(user -> {
                     user.setFirstName(updatedUser.getFirstName());
@@ -48,7 +48,7 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    public void deleteUserById(Integer id) {
+    public void deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
@@ -57,7 +57,7 @@ public class UserService {
     }
 
 
-    public Integer loginUser(String email, String password) {
+    public Long loginUser(String email, String password) {
         return userRepository.findByEmailIgnoreCase(email)
                 .filter(user -> user.getPassword().equals(password))
                 .map(user -> user.getId())

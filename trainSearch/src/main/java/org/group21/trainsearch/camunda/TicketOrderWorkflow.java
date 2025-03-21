@@ -14,6 +14,9 @@ import java.util.Map;
 
 @Service
 @Slf4j
+/**
+ * This class is responsible for defining the Camunda workflow for the ticket order process.
+ */
 public class TicketOrderWorkflow implements ExecutionListener {
 
     public static final String ORDER_WORKFLOW_NAME = "TicketOrderWorkflow";
@@ -26,9 +29,9 @@ public class TicketOrderWorkflow implements ExecutionListener {
     public static final String VARIABLE_TICKET_ID = "ticketId";
     public static final String VARIABLE_PAYMENT_METHOD = "payment_method";
     public static final String VARIABLE_PAYMENT_ID = "paymentId";
-
     public static final String BOOKING_SERVICE_URL = "http://booking/booking";
     public static final String TICKET_SERVICE_URL = "http://ticket/ticket";
+    public static final String PAYMENT_SERVICE_URL = "http://payment/payment";
 
     private final ProcessEngine camunda;
 
@@ -38,6 +41,10 @@ public class TicketOrderWorkflow implements ExecutionListener {
     }
 
     @PostConstruct
+    /**
+     * Defines the Camunda workflow for the ticket order process. It uses the {@link ModelBuilderHelper} to create the
+     * workflow.
+     */
     void defineCamundaWorkflow() {
         BpmnModelInstance workflow = ModelBuilderHelper.newModel(ORDER_WORKFLOW_NAME)
                 .start()
@@ -53,12 +60,16 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .triggerCompensationOnError(DO_NOT_RETRY)
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .build();
-        camunda.getProcessEngineConfiguration();
         camunda.getRepositoryService().createDeployment()
                 .addModelInstance("buyTicket.bpmn", workflow)
                 .deploy();
     }
 
+    /**
+     * Starts the ticket order workflow for the given user and route.
+     * @param userId The ID of the user who is ordering the ticket
+     * @param route The {@link Route} for which the ticket is being ordered
+     */
     public void startTicketOrderWorkflow(long userId, Route route) {
         camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(10);
 

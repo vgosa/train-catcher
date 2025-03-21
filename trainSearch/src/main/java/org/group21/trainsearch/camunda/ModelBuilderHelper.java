@@ -12,6 +12,10 @@ import org.group21.trainsearch.camunda.exceptions.ParallelGatewayException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+/**
+ * Class used to build BPMN models in code. It provides a builder pattern to create a BPMN model instance.
+ * The main advantage of building models in code is that they can be versioned with git, which is easier to maintain.
+ */
 public class ModelBuilderHelper {
 
     private final String name;
@@ -23,20 +27,41 @@ public class ModelBuilderHelper {
     private AbstractFlowNodeBuilder saga;
     private BpmnModelInstance bpmnModelInstance;
 
+    /**
+     * Create a new model builder with default retry time cycle.
+     * The default retry time cycle is set to 2 retries with 6 seconds between them.
+     * @param name name of the process
+     */
     public ModelBuilderHelper(String name) {
         this(name, "R2/PT6S");
     }
 
+    /**
+     * Create a new model builder with custom retry time cycle.
+     * The retry time cycle follows the ISO_8601 standard.
+     * @see <a href="https://en.wikipedia.org/wiki/ISO_8601#Durations">ISO 8601 Durations</a>
+     * @param name name of the process
+     * @param retryTimeCycle retry time cycle
+     */
     public ModelBuilderHelper(String name, String retryTimeCycle) {
         this.name = name;
         this.retryTimeCycle = retryTimeCycle;
         process = Bpmn.createExecutableProcess(name);
     }
 
+    /**
+     * Create a new model. This is the entry point for any workflow definition.
+     * @param name
+     * @return
+     */
     public static ModelBuilderHelper newModel(String name) {
         return new ModelBuilderHelper(name);
     }
 
+    /**
+     * Build the BPMN model instance.
+     * @return BPMN model instance
+     */
     public BpmnModelInstance build() {
         if (bpmnModelInstance == null) {
             bpmnModelInstance = saga.done();
@@ -44,16 +69,31 @@ public class ModelBuilderHelper {
         return bpmnModelInstance;
     }
 
+    /**
+     * Start node of the process.
+     * @return builder
+     */
     public ModelBuilderHelper start() {
         saga = process.startEvent("Start-" + name);
         return this;
     }
 
+    /**
+     * End node of the process.
+     * @return builder
+     */
     public ModelBuilderHelper end() {
         saga = saga.endEvent("EndSuccess-" + name);
         return this;
     }
 
+    /**
+     * Define an activity in the BPMN flow.
+     * The activity is asynchronous and is retried according to the retry time cycle.
+     * @param name name of the activity
+     * @param adapterClass class implementing the activity logic (must implement {@link org.camunda.bpm.engine.delegate.JavaDelegate})
+     * @return builder
+     */
     @SuppressWarnings("rawtypes")
     public ModelBuilderHelper activity(String name, Class adapterClass) {
         // this is very handy and could also be done inline above directly
@@ -68,8 +108,8 @@ public class ModelBuilderHelper {
 
     /**
      * Define a SAGA compensation activity for the last defined activity on the BPMN flow.
-     * @param name - name of the compensation activity
-     * @param adapterClass - class implementing the compensation logic (must implement {@link org.camunda.bpm.engine.delegate.JavaDelegate})
+     * @param name name of the compensation activity
+     * @param adapterClass class implementing the compensation logic (must implement {@link org.camunda.bpm.engine.delegate.JavaDelegate})
      * @return builder
      */
     @SuppressWarnings("rawtypes")
@@ -97,7 +137,7 @@ public class ModelBuilderHelper {
 
     /**
      * Trigger a compensation strategy on error. Used to define a compensation flow for a given error code globally.
-     * @param errorCode - error code to trigger the compensation
+     * @param errorCode error code to trigger the compensation
      * @return builder
      */
     public ModelBuilderHelper triggerCompensationOnError(String errorCode) {
@@ -113,7 +153,7 @@ public class ModelBuilderHelper {
     /**
      * Allows to register listener to events and activities. Call it immediately after building an event or activity.
      *
-     * @param event         One of {@link ExecutionListener#EVENTNAME_START}, {@link ExecutionListener#EVENTNAME_END},
+     * @param event One of {@link ExecutionListener#EVENTNAME_START}, {@link ExecutionListener#EVENTNAME_END},
      *                      {@link ExecutionListener#EVENTNAME_TAKE}
      * @param listenerClass Class implementing {@link ExecutionListener} interface that will be notified
      * @return builder
@@ -193,7 +233,7 @@ public class ModelBuilderHelper {
      * It's unsafe as hell, but it is much easier to work this way for now.
      *
      * @param name Activity name
-     * @return ID - safe for BPMN
+     * @return ID safe for BPMN
      */
     private String stringToID(String name) {
         return name.replace(" ", "-");

@@ -19,8 +19,6 @@ import java.net.URI;
 @Slf4j
 public class PaymentIssuePayment implements JavaDelegate {
 
-    private final static String PAYMENT_SERVICE_URL = "http://payment/payment";
-
     private final ObjectMapper objectMapper;
 
     private final RestTemplate restTemplate;
@@ -56,7 +54,7 @@ public class PaymentIssuePayment implements JavaDelegate {
                 .put("userId", userId)
                 .put("bookingId", bookingId)
                 .put("payment_method", paymentMethod);
-        URI paymentURL = UriBuilder.fromPath(PAYMENT_SERVICE_URL + "/" + paymentMethod)
+        URI paymentURL = UriBuilder.fromPath(TicketOrderWorkflow.PAYMENT_SERVICE_URL + "/" + paymentMethod)
                 .queryParam("userId", userId)
                 .queryParam("bookingId", bookingId)
                 .build();

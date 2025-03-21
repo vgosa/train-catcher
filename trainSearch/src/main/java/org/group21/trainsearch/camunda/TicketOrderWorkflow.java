@@ -27,7 +27,7 @@ public class TicketOrderWorkflow implements ExecutionListener {
     public static final String VARIABLE_ROUTE = "route";
 
     public static final String VARIABLE_USER_ID = "userId";
-    public static final String VARIABLE_TICKET_ID = "ticketId";
+    public static final String VARIABLE_TICKET = "ticket";
 
     public static final String VARIABLE_PAYMENT_METHOD = "payment_method";
     public static final String VARIABLE_PAYMENT_ID = "paymentId";

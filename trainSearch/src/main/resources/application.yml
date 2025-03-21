@@ -19,6 +19,10 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  activemq:
+    broker-url: tcp://127.0.0.1:61616
+    user: admin
+    password: admin
 
 restTemplate:
   connectTimeout: 5

@@ -57,12 +57,11 @@ public class TicketCreateTicket implements JavaDelegate {
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
-        // Successfully received response from ticket service. Getting ID of the ticket
+        // Successfully received response from ticket service. Getting the ticket from the response.
         String ticketString = response.getBody();
 
-        long ticketId;
         try {
-            ticketId = objectMapper.readValue(ticketString, Ticket.class).getId();
+            ticket = objectMapper.readValue(ticketString, Ticket.class);
         } catch (Exception e) {
             String errorMsg = "Failed to parse ticket ID from ticket service response";
             log.error(errorMsg, e);
@@ -70,7 +69,7 @@ public class TicketCreateTicket implements JavaDelegate {
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
-        execution.setVariable(TicketOrderWorkflow.VARIABLE_TICKET_ID, ticketId);
-        log.info("Successfully created ticket with ID {}", ticketId);
+        execution.setVariable(TicketOrderWorkflow.VARIABLE_TICKET, ticket);
+        log.info("Successfully created ticket with ID {}", ticket);
     }
 }

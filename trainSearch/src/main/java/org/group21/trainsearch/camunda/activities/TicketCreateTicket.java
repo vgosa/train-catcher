@@ -5,17 +5,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.group21.trainsearch.camunda.TicketOrderWorkflow;
 import org.group21.trainsearch.model.Ticket;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 @Component
 @Slf4j
 public class TicketCreateTicket implements JavaDelegate {
 
-    private final String TICKET_SERVICE_URL = "http://ticket/ticket";
+
 
     private final ObjectMapper objectMapper;
 
@@ -29,6 +31,12 @@ public class TicketCreateTicket implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
+
+        if (Context.getJobExecutorContext().getCurrentJob().getRetries() <= 1) {
+            String errorMsg = "Failed to create ticket. No more retries left.";
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
 
         Long bookingId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_BOOKING_ID).getValue();
         Long userId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER_ID).getValue();
@@ -48,7 +56,7 @@ public class TicketCreateTicket implements JavaDelegate {
 
         log.info("Contacting the ticket service to create a ticket.");
 
-        ResponseEntity<String> response = restTemplate.postForEntity(TICKET_SERVICE_URL, ticket, String.class);
+        ResponseEntity<String> response = restTemplate.postForEntity(TicketOrderWorkflow.TICKET_SERVICE_URL, ticket, String.class);
 
         if (response.getStatusCode().isError()) {
             String errorMsg = String.format("Failed to create ticket. Ticket service returned status code %s", response.getStatusCode());
@@ -70,6 +78,7 @@ public class TicketCreateTicket implements JavaDelegate {
         }
 
         execution.setVariable(TicketOrderWorkflow.VARIABLE_TICKET, ticket);
+        execution.setVariable(TicketOrderWorkflow.VARIABLE_TICKET_ID, ticket.getId());
         log.info("Successfully created ticket with ID {}", ticket);
     }
 }

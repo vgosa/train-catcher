@@ -24,7 +24,7 @@ public class ModelBuilderHelper {
     private BpmnModelInstance bpmnModelInstance;
 
     public ModelBuilderHelper(String name) {
-        this(name, "R4/PT9S");
+        this(name, "R2/PT6S");
     }
 
     public ModelBuilderHelper(String name, String retryTimeCycle) {
@@ -65,7 +65,6 @@ public class ModelBuilderHelper {
                 .camundaFailedJobRetryTimeCycle(retryTimeCycle);
         return this;
     }
-
 
     /**
      * Define a SAGA compensation activity for the last defined activity on the BPMN flow.

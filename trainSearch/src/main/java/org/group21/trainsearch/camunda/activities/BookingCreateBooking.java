@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.group21.trainsearch.camunda.TicketOrderWorkflow;
 import org.group21.trainsearch.model.Route;
 import org.springframework.http.ResponseEntity;
@@ -14,8 +15,6 @@ import org.springframework.web.client.RestTemplate;
 @Component
 @Slf4j
 public class BookingCreateBooking implements JavaDelegate {
-
-    private final static String BOOKING_SERVICE_URL = "http://booking/booking";
 
     private final ObjectMapper objectMapper;
 
@@ -29,6 +28,12 @@ public class BookingCreateBooking implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) {
         log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
+
+        if (Context.getJobExecutorContext().getCurrentJob().getRetries() <= 1) {
+            String errorMsg = "Failed to create booking. No more retries left.";
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
 
         Route route;
         try {
@@ -48,7 +53,7 @@ public class BookingCreateBooking implements JavaDelegate {
 
         log.info("Successfully parsed route from execution variables. Contacting the booking service to create a booking.");
 
-        ResponseEntity<String> response = restTemplate.postForEntity(BOOKING_SERVICE_URL +
+        ResponseEntity<String> response = restTemplate.postForEntity(TicketOrderWorkflow.BOOKING_SERVICE_URL +
                 String.format("?%s=%s", TicketOrderWorkflow.VARIABLE_USER_ID,
                 execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER_ID).getValue()), route, String.class);
 

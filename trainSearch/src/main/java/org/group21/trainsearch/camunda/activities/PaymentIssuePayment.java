@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.group21.trainsearch.camunda.TicketOrderWorkflow;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -31,6 +32,12 @@ public class PaymentIssuePayment implements JavaDelegate {
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
+
+        if (Context.getJobExecutorContext().getCurrentJob().getRetries() <= 1) {
+            String errorMsg = "Failed to issue payment. No more retries left.";
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
 
         String paymentMethod = (String) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_PAYMENT_METHOD).getValue();
         Long userId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER_ID).getValue();

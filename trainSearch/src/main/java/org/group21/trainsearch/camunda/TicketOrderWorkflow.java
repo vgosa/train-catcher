@@ -17,20 +17,18 @@ import java.util.Map;
 public class TicketOrderWorkflow implements ExecutionListener {
 
     public static final String ORDER_WORKFLOW_NAME = "TicketOrderWorkflow";
-
     public static final String FAILURE_REASON = "failureReason";
-
     public static final String DO_NOT_RETRY = "DoNotRetry";
-
     public static final String VARIABLE_BOOKING_ID = "bookingId";
-
     public static final String VARIABLE_ROUTE = "route";
-
     public static final String VARIABLE_USER_ID = "userId";
     public static final String VARIABLE_TICKET = "ticket";
-
+    public static final String VARIABLE_TICKET_ID = "ticketId";
     public static final String VARIABLE_PAYMENT_METHOD = "payment_method";
     public static final String VARIABLE_PAYMENT_ID = "paymentId";
+
+    public static final String BOOKING_SERVICE_URL = "http://booking/booking";
+    public static final String TICKET_SERVICE_URL = "http://ticket/ticket";
 
     private final ProcessEngine camunda;
 
@@ -45,19 +43,17 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .start()
                 .activity("Create booking", BookingCreateBooking.class)
                 .compensationActivity("Compensate booking creation", BookingCompensateCreateBooking.class)
-                .parallelStart()
                 .activity("Create ticket for booking", TicketCreateTicket.class)
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
-                .parallelNext()
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
-                .parallelEnd()
                 .activity("Send ticket via email", EmailSendTicket.class)
                 .end()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .triggerCompensationOnError(DO_NOT_RETRY)
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .build();
+        camunda.getProcessEngineConfiguration();
         camunda.getRepositoryService().createDeployment()
                 .addModelInstance("buyTicket.bpmn", workflow)
                 .deploy();
@@ -77,7 +73,7 @@ public class TicketOrderWorkflow implements ExecutionListener {
         //TODO: This is triggered when a job is finally executed
         log.info("Notification listener was called because a job is complete {}", execution);
         if (execution.getCurrentActivityName().contains(DO_NOT_RETRY)) {
-            log.error("An error occurred during the execution of the job. The job will not be retried.");
+            log.error("The job failed to execute");
         } else {
             log.info("The job was successfully executed. Booking ID: {}",
                     execution.getVariable(VARIABLE_BOOKING_ID));

@@ -41,7 +41,7 @@ public class TicketListener {
         } catch (MailException e) {
             log.error("Error processing ticket notification. CAUSE: Could not send the email confirmation!");
         } catch (JsonProcessingException e) {
-            log.error("Error processing ticket notification. CAUSE: Could not read the dequeued message!");
+            log.error("Error processing ticket notification. CAUSE: Could not read the dequeued message! The contents are: \n {}", message);
         } catch (Exception e) {
             log.error("Error processing ticket notification.", e);
         }

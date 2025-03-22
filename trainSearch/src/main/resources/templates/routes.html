@@ -8,6 +8,11 @@
     <title>Train Catcher</title>
 </head>
 <body>
+<script>
+    if (!localStorage.getItem("token")) {
+        window.location.href = "/";
+    }
+</script>
 <div class="fluid-container">
     <h2>Select your route!</h2>
         <div class="accordion" id="routes-accordion">

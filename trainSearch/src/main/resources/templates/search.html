@@ -8,6 +8,11 @@
     <title>Train Catcher</title>
 </head>
 <body>
+    <script>
+        if (!localStorage.getItem("token")) {
+            window.location.href = "/";
+        }
+    </script>
     <h2>Search for your next train journey</h2>
     <div class="container-fluid">
         <form id="train-search-form">

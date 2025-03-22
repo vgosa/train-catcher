@@ -29,15 +29,23 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest){
-        try{
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginRequest loginRequest){
+        try {
             String token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(token);
+            Optional<User> userOpt = userService.getUserByEmail(loginRequest.getEmail());
+            if (userOpt.isEmpty()) {
+                throw new RuntimeException("User not found");
+            }
+            Long userId = userOpt.get().getId();
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);
+            response.put("userId", userId);
+            return ResponseEntity.ok(response);
         } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
         }
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@RequestBody(required = false) Object logoutRequest){

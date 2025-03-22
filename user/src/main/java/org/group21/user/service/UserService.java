@@ -1,6 +1,7 @@
 package org.group21.user.service;
 
 
+import org.group21.JwtUtil;
 import org.group21.user.model.*;
 import org.group21.user.repository.*;
 import org.group21.user.util.*;
@@ -71,7 +72,7 @@ public class UserService {
                 .filter(u -> u.getPassword().equals(hashedPassword))
                 .orElseThrow(() -> new RuntimeException("Invalid email/password supplied"));
 
-        return JwtUtil.generateToken(email);
+        return JwtUtil.generateToken(email, user.getId());
     }
 
 

@@ -30,14 +30,14 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest){
-        // For simplicity, no session management is implemented yet
         try{
-            Long response = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(response.toString());
+            String token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+            return ResponseEntity.ok(token);
         } catch(Exception e){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
+
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@RequestBody(required = false) Object logoutRequest){

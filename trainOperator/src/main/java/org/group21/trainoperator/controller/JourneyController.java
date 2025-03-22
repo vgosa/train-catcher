@@ -21,7 +21,7 @@ public class JourneyController {
         this.journeyService = journeyService;
     }
 
-    @GetMapping
+    @GetMapping(produces = "application/json;charset=UTF-8")
     public ResponseEntity<List<Journey>> findJourneys(
             @RequestParam(value = "departure_station", required = false) String departureStation,
             @RequestParam(value = "arrival_station", required = false) String arrivalStation,

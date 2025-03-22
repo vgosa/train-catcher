@@ -3,6 +3,7 @@ package org.group21.user.service;
 
 import org.group21.user.model.*;
 import org.group21.user.repository.*;
+import org.group21.user.util.*;
 import org.springframework.stereotype.*;
 
 import java.util.*;
@@ -16,10 +17,15 @@ public class UserService {
     }
 
     public User createUser(User user) {
+        user.setPassword(PasswordUtil.hashPassword(user.getEmail(), user.getPassword()));
         return userRepository.save(user);
     }
 
+
     public List<User> createUsers(List<User> users) {
+        users.forEach(user ->
+                user.setPassword(PasswordUtil.hashPassword(user.getEmail(), user.getPassword()))
+        );
         return userRepository.saveAll(users);
     }
 
@@ -40,13 +46,14 @@ public class UserService {
                 .map(user -> {
                     user.setFirstName(updatedUser.getFirstName());
                     user.setLastName(updatedUser.getLastName());
-                    user.setPassword(updatedUser.getPassword());
+                    user.setPassword(PasswordUtil.hashPassword(user.getEmail(), updatedUser.getPassword()));
                     user.setPhone(updatedUser.getPhone());
                     user.setBalance(updatedUser.getBalance());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
+
 
     public void deleteUserById(Long id) {
         if (userRepository.existsById(id)) {
@@ -57,10 +64,15 @@ public class UserService {
     }
 
 
-    public Long loginUser(String email, String password) {
-        return userRepository.findByEmailIgnoreCase(email)
-                .filter(user -> user.getPassword().equals(password))
-                .map(user -> user.getId())
+    public String loginUser(String email, String password) {
+        String hashedPassword = PasswordUtil.hashPassword(email, password);
+
+        User user = userRepository.findByEmailIgnoreCase(email)
+                .filter(u -> u.getPassword().equals(hashedPassword))
                 .orElseThrow(() -> new RuntimeException("Invalid email/password supplied"));
+
+        return JwtUtil.generateToken(email);
     }
+
+
 }

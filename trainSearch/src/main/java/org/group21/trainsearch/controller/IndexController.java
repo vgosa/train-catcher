@@ -31,6 +31,11 @@ public class IndexController {
         return "search";
     }
 
+    @GetMapping("/signup")
+    public String showSignupPage() {
+        return "signup";
+    }
+
     @GetMapping("/routes")
     public String showRoutes(Model model,
                              @RequestParam("departure_station") String departureStation,

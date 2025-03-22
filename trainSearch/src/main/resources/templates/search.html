@@ -12,7 +12,16 @@
         if (!localStorage.getItem("token")) {
             window.location.href = "/";
         }
+        function logout() {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            localStorage.removeItem("userEmail");
+            window.location.href = "/";
+        }
     </script>
+    <div class="container mt-3">
+        <button type="button" class="btn btn-secondary float-end" onclick="logout()">Logout</button>
+    </div>
     <h2>Search for your next train journey</h2>
     <div class="container-fluid">
         <form id="train-search-form">

@@ -18,10 +18,17 @@ public class UserProxyController {
 
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody LoginRequest loginRequest) {
-        // Use the service name registered in Consul for the user service
         String url = "http://user/user/login";
         // Forward the login request to the user service
         ResponseEntity<Map> response = restTemplate.postForEntity(url, loginRequest, Map.class);
+        return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createUser(@RequestBody Map<String, Object> user) {
+        String url = "http://user/user";
+        // Forward the user creation request to the user service
+        ResponseEntity<Map> response = restTemplate.postForEntity(url, user, Map.class);
         return ResponseEntity.status(response.getStatusCode()).body(response.getBody());
     }
 }

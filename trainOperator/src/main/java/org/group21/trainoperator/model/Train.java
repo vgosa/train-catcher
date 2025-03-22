@@ -6,7 +6,7 @@ import lombok.*;
 @Entity
 @Table(name = "train")
 @NoArgsConstructor
-//@AllArgsConstructor
+@AllArgsConstructor
 @Getter
 @Setter
 public class Train {

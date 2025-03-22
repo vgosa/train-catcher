@@ -49,6 +49,7 @@ public class TrainSearchService {
                 }
             } catch (RestClientException e) {
                 System.err.println("Error querying operator " + operator.getUrl() + ": " + e.getMessage());
+                throw e;
             }
         }
 

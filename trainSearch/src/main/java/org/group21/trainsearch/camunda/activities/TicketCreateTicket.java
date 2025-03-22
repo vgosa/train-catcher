@@ -10,7 +10,6 @@ import org.group21.trainsearch.camunda.TicketOrderWorkflow;
 import org.group21.trainsearch.model.Ticket;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 
 @Component

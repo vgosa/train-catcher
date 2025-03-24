@@ -2,6 +2,8 @@ package org.group21.user.service;
 
 
 import org.group21.JwtUtil;
+import org.group21.user.exception.InvalidCredentialsException;
+import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
 import org.group21.user.repository.*;
 import org.group21.user.util.*;
@@ -52,7 +54,7 @@ public class UserService {
                     user.setBalance(updatedUser.getBalance());
                     return userRepository.save(user);
                 })
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found during update operation", id));
     }
 
 
@@ -60,7 +62,7 @@ public class UserService {
         if (userRepository.existsById(id)) {
             userRepository.deleteById(id);
         } else {
-            throw new RuntimeException("User not found");
+            throw new UserNotFoundException("User not found during delete operation", id);
         }
     }
 
@@ -70,7 +72,7 @@ public class UserService {
 
         User user = userRepository.findByEmailIgnoreCase(email)
                 .filter(u -> u.getPassword().equals(hashedPassword))
-                .orElseThrow(() -> new RuntimeException("Invalid email/password supplied"));
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email/password supplied"));
 
         return JwtUtil.generateToken(email, user.getId());
     }

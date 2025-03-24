@@ -24,9 +24,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // For simplicity, the password is stored as plain text
-    // However, in a real-life scenario, this would be stored as a salted hash
-    // to avoid storing plain text passwords
     @Column(nullable = false)
     private String password;
 

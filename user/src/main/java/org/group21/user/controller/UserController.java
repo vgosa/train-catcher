@@ -1,5 +1,7 @@
 package org.group21.user.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
 import org.group21.user.service.*;
 import org.springframework.http.*;
@@ -9,6 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
     private final UserService userService;
 
@@ -34,11 +37,11 @@ public class UserController {
             String token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
             Optional<User> userOpt = userService.getUserByEmail(loginRequest.getEmail());
             if (userOpt.isEmpty()) {
-                throw new RuntimeException("User not found");
+                throw new UserNotFoundException("User not found during login", loginRequest.getEmail());
             }
             Long userId = userOpt.get().getId();
             Map<String, Object> response = new HashMap<>();
-            response.put("token", token);
+            response.put("token", token);  //TODO: Send as HTTP-only cookie
             response.put("userId", userId);
             return ResponseEntity.ok(response);
         } catch(Exception e){
@@ -49,7 +52,7 @@ public class UserController {
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@RequestBody(required = false) Object logoutRequest){
-        // For simplicity, no session management is implemented yet
+        //TODO: For simplicity, no session management is implemented yet
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -62,9 +65,9 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        System.out.println("getting users");
+        log.debug("Fetching users");
         List<User> allUsers = userService.getAllUsers();
-        System.out.println(allUsers);
+        log.debug(Arrays.toString(allUsers.toArray()));
         return ResponseEntity.ok(allUsers);
     }
 
@@ -84,9 +87,9 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
         try {
             userService.deleteUserById(id);
-            System.out.println(userService.getAllUsers());
+            log.info("User with ID {} deleted", id);
             return ResponseEntity.noContent().build();
-        } catch(Exception e){
+        } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

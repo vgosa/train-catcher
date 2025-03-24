@@ -8,6 +8,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import java.util.Date;
 
 public class JwtUtil {
+    //TODO: Switch to Kubernetes/Consul Vault for secret management
     private static final String SECRET_KEY = "secretKeyForDemo";
     private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
 

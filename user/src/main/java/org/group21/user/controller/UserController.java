@@ -1,5 +1,7 @@
 package org.group21.user.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
 import org.group21.user.service.*;
 import org.springframework.http.*;
@@ -9,6 +11,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/user")
+@Slf4j
 public class UserController {
     private final UserService userService;
 
@@ -29,19 +32,27 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody LoginRequest loginRequest){
-        // For simplicity, no session management is implemented yet
-        try{
-            Long response = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-            return ResponseEntity.ok(response.toString());
+    public ResponseEntity<Map<String, Object>> loginUser(@RequestBody LoginRequest loginRequest){
+        try {
+            String token = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
+            Optional<User> userOpt = userService.getUserByEmail(loginRequest.getEmail());
+            if (userOpt.isEmpty()) {
+                throw new UserNotFoundException("User not found during login", loginRequest.getEmail());
+            }
+            Long userId = userOpt.get().getId();
+            Map<String, Object> response = new HashMap<>();
+            response.put("token", token);  //TODO: Send as HTTP-only cookie
+            response.put("userId", userId);
+            return ResponseEntity.ok(response);
         } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Collections.singletonMap("error", e.getMessage()));
         }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser(@RequestBody(required = false) Object logoutRequest){
-        // For simplicity, no session management is implemented yet
+        //TODO: For simplicity, no session management is implemented yet
         return ResponseEntity.ok("Logout successful");
     }
 
@@ -54,9 +65,9 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        System.out.println("getting users");
+        log.debug("Fetching users");
         List<User> allUsers = userService.getAllUsers();
-        System.out.println(allUsers);
+        log.debug(Arrays.toString(allUsers.toArray()));
         return ResponseEntity.ok(allUsers);
     }
 
@@ -76,9 +87,9 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
         try {
             userService.deleteUserById(id);
-            System.out.println(userService.getAllUsers());
+            log.info("User with ID {} deleted", id);
             return ResponseEntity.noContent().build();
-        } catch(Exception e){
+        } catch(Exception e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }

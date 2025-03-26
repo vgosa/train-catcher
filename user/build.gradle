@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    mavenLocal()
 }
 
 ext {
@@ -40,6 +41,8 @@ dependencies {
     implementation 'org.projectlombok:lombok:1.18.28'
     annotationProcessor 'org.projectlombok:lombok:1.18.28'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    implementation 'com.auth0:java-jwt:4.5.0'
+    implementation 'org.group21:common-utils:1.0.0'
 }
 
 dependencyManagement {

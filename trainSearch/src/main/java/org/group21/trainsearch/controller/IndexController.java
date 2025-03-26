@@ -22,8 +22,18 @@ public class IndexController {
     }
 
     @GetMapping("/")
-    public String showIndex() {
+    public String showLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("/search")
+    public String showSearchPage() {
         return "search";
+    }
+
+    @GetMapping("/signup")
+    public String showSignupPage() {
+        return "signup";
     }
 
     @GetMapping("/routes")

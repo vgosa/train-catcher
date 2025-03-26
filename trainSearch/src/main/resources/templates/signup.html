@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Train Catcher - Sign Up</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+  <h2>Sign Up</h2>
+  <form id="signup-form">
+    <div class="mb-3">
+      <label for="firstName" class="form-label">First Name:</label>
+      <input type="text" class="form-control" id="firstName" name="firstName" required>
+    </div>
+    <div class="mb-3">
+      <label for="lastName" class="form-label">Last Name:</label>
+      <input type="text" class="form-control" id="lastName" name="lastName" required>
+    </div>
+    <div class="mb-3">
+      <label for="email" class="form-label">Email address:</label>
+      <input type="email" class="form-control" id="email" name="email" required>
+    </div>
+    <div class="mb-3">
+      <label for="phone" class="form-label">Phone:</label>
+      <input type="text" class="form-control" id="phone" name="phone">
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password:</label>
+      <input type="password" class="form-control" id="password" name="password" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Sign Up</button>
+  </form>
+  <br/>
+  <!-- Button to go back to the Login page -->
+  <button type="button" class="btn btn-secondary" onclick="window.location.href='/login'">Already have an account? Log In</button>
+</div>
+<script>
+  document.getElementById("signup-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const firstName = document.getElementById("firstName").value;
+    const lastName = document.getElementById("lastName").value;
+    const email = document.getElementById("email").value;
+    const phone = document.getElementById("phone").value;
+    const password = document.getElementById("password").value;
+    const user = { firstName, lastName, email, phone, password };
+    try {
+      // Send the sign-up request via the search service's user proxy
+      const response = await fetch("/user", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user)
+      });
+      if (response.ok) {
+        alert("User created successfully. Please log in.");
+        window.location.href = "/";
+      } else {
+        const errorMsg = await response.text();
+        alert("Sign up failed: " + errorMsg);
+      }
+    } catch (err) {
+      alert("Error during sign up: " + err);
+    }
+  });
+</script>
+</body>
+</html>

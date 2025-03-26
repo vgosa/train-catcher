@@ -3,8 +3,7 @@ package org.group21.trainsearch.camunda;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.Bpmn;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
-import org.camunda.bpm.model.bpmn.builder.AbstractActivityBuilder;
-import org.camunda.bpm.model.bpmn.builder.AbstractFlowNodeBuilder;
+import org.camunda.bpm.model.bpmn.builder.*;
 import org.camunda.bpm.model.bpmn.builder.ProcessBuilder;
 import org.group21.trainsearch.camunda.exceptions.CompensationActivityException;
 import org.group21.trainsearch.camunda.exceptions.ParallelGatewayException;
@@ -82,8 +81,17 @@ public class ModelBuilderHelper {
      * End node of the process.
      * @return builder
      */
-    public ModelBuilderHelper end() {
+    public ModelBuilderHelper endSuccess() {
         saga = saga.endEvent("EndSuccess-" + name);
+        return this;
+    }
+
+    /**
+     * End node of the process in case of failure.
+     * @return builder
+     */
+    public ModelBuilderHelper endFail() {
+        saga = saga.endEvent("EndFail-" + name);
         return this;
     }
 
@@ -160,6 +168,43 @@ public class ModelBuilderHelper {
      */
     public ModelBuilderHelper addListener(String event, Class<? extends ExecutionListener> listenerClass) {
         saga = saga.camundaExecutionListenerClass(event, listenerClass);
+        return this;
+    }
+
+    /**
+     * Create an exclusive gateway to choose an execution path based on a condition expression {@link org.camunda.bpm.engine.delegate.Expression}
+     * @param name name of the gateway
+     * @return builder
+     */
+    public ModelBuilderHelper exclusiveGateway(String name) {
+        String id= "ExclusiveGateway-" + stringToID(name);
+        saga = saga.exclusiveGateway(id);
+        return this;
+    }
+
+    /**
+     * Define a condition expression for the last defined exclusive gateway. The expression uses the Unified
+     * Expression Language (EL) specification. @link <a href="https://docs.camunda.org/manual/latest/user-guide/process-engine/expression-language/">Camunda EL</a>
+     * @param name name of the condition branch
+     * @param expression expression to evaluate
+     * @return builder
+     */
+    public ModelBuilderHelper conditionExpression(String name, String expression) {
+        if (!(saga instanceof ExclusiveGatewayBuilder)) {
+            throw new ParallelGatewayException(
+                    "Error. You are trying to define condition expression but no exclusive gateway has been started " +
+                            "before!");
+        }
+        saga = saga.condition(name, expression);
+        return this;
+    }
+
+    /**
+     * Move to the last defined gateway. To be used after defining a condition expression.
+     * @return builder
+     */
+    public ModelBuilderHelper moveToLastGateway() {
+        saga = saga.moveToLastGateway();
         return this;
     }
 

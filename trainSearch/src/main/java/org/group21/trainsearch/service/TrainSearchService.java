@@ -1,6 +1,6 @@
 package org.group21.trainsearch.service;
 
-import org.group21.trainsearch.camunda.TicketOrderWorkflow;
+import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.util.*;
 import org.springframework.beans.factory.annotation.Autowired;

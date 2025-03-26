@@ -8,7 +8,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.group21.trainsearch.camunda.TicketOrderWorkflow;
+import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -36,7 +36,6 @@ public class PaymentIssuePayment implements JavaDelegate {
             execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
-
         String paymentMethod = (String) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_PAYMENT_METHOD).getValue();
         Long userId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER_ID).getValue();
         Long bookingId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_BOOKING_ID).getValue();

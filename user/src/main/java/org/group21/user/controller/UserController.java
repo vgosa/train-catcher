@@ -82,6 +82,16 @@ public class UserController {
         }
     }
 
+    @PostMapping("/{id}/topup")
+    public ResponseEntity<User> topUpUser(
+            @PathVariable Long id,
+            @RequestBody Double amount) {
+
+        User updated = userService.topUpBalance(id, amount);
+        return ResponseEntity.ok(updated);
+    }
+
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){

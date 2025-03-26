@@ -1,6 +1,7 @@
 package org.group21.user.service;
 
 
+import jakarta.persistence.*;
 import org.group21.JwtUtil;
 import org.group21.user.exception.InvalidCredentialsException;
 import org.group21.user.exception.UserNotFoundException;
@@ -75,6 +76,13 @@ public class UserService {
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email/password supplied"));
 
         return JwtUtil.generateToken(email, user.getId());
+    }
+
+    public User topUpBalance(Long id, Double amount) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+        user.setBalance(user.getBalance() + amount);
+        return userRepository.save(user);
     }
 
 

@@ -83,12 +83,12 @@ public class UserController {
     }
 
     @PostMapping("/{id}/topup")
-    public ResponseEntity<User> topUpUser(
+    public ResponseEntity<Double> topUpUser(
             @PathVariable Long id,
             @RequestBody Double amount) {
 
         User updated = userService.topUpBalance(id, amount);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(updated.getBalance());
     }
 
 

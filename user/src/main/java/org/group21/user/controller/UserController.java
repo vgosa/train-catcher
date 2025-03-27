@@ -1,9 +1,11 @@
 package org.group21.user.controller;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
 import org.group21.user.service.*;
+import org.group21.user.views.Views;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,12 +22,14 @@ public class UserController {
     }
 
     @PostMapping
+    @JsonView(Views.Public.class)
     public ResponseEntity<User> createUser(@RequestBody User user){
         User created = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PostMapping("/createWithList")
+    @JsonView(Views.Public.class)
     public ResponseEntity<List<User>> createUsersWithListInput(@RequestBody List<User> users){
         List<User> createdList = userService.createUsers(users);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdList);
@@ -57,6 +61,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
+    @JsonView(Views.Public.class)
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
@@ -64,6 +69,7 @@ public class UserController {
     }
 
     @GetMapping
+    @JsonView(Views.Public.class)
     public ResponseEntity<List<User>> getAllUsers() {
         log.debug("Fetching users");
         List<User> allUsers = userService.getAllUsers();
@@ -73,6 +79,7 @@ public class UserController {
 
 
     @PutMapping("/{id}")
+    @JsonView(Views.Public.class)
     public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user){
         try {
             User updated = userService.updateUser(id, user);
@@ -81,6 +88,16 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
     }
+
+    @PostMapping("/{id}/topup")
+    public ResponseEntity<Double> topUpUser(
+            @PathVariable Long id,
+            @RequestBody Double amount) {
+
+        User updated = userService.topUpBalance(id, amount);
+        return ResponseEntity.ok(updated.getBalance());
+    }
+
 
 
     @DeleteMapping("/{id}")

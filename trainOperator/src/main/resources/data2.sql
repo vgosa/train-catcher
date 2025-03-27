@@ -1,3 +1,6 @@
+-- Insert Operator
+INSERT INTO operator (name, balance) VALUES ('Arriva', 10000.00);
+
 -- Insert Trains (data2)
 INSERT INTO train (name, seats) VALUES ('SLT', 110);
 INSERT INTO train (name, seats) VALUES ('FLIRT', 130);

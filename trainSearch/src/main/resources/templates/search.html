@@ -97,7 +97,7 @@
         if (resp.ok) {
             const user = await resp.json();
             document.getElementById("userInfo").innerText =
-                `Welcome, ${user.firstName} ${user.lastName} — Balance: €${user.balance.toFixed(2)}`;
+                `Welcome, ${user.firstName} ${user.lastName} — Balance: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(user.balance)}`;
         }
     }
     loadUserInfo();
@@ -127,7 +127,7 @@
         });
         if (!resp.ok) throw new Error(await resp.text());
         const newBalance = await resp.json();
-        alert(`Balance updated: €${newBalance.toFixed(2)}`);
+        alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(newBalance)}`);
         document.getElementById("topUpAmount").value = '';
         bootstrap.Modal.getInstance(document.getElementById('topUpModal')).hide();
         loadUserInfo();

@@ -1,5 +1,6 @@
 package org.group21.trainsearch.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import java.io.Serializable;
@@ -8,6 +9,16 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Operator implements Serializable {
-    private String name; // optional, if you want to keep metadata
+
+    public Operator(String name, String url) {
+        this.name = name;
+        this.url = url;
+    }
+
+    @JsonIgnore
+    private Long id;
+    private String name;
+    private Double balance = 0.0;
+    @JsonIgnore
     private String url;
 }

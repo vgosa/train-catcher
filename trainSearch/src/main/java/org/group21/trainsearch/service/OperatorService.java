@@ -17,8 +17,8 @@ public class OperatorService {
 
     private final List<Operator> operators = new CopyOnWriteArrayList<>(
             Arrays.asList(
-                    new Operator("Operator 1", String.format("http://%s%d", OPERATOR_SERVICE_ID, 1)),
-                    new Operator("Operator 2", String.format("http://%s%d", OPERATOR_SERVICE_ID, 2))
+                    new Operator("NS", String.format("http://%s%d", OPERATOR_SERVICE_ID, 1)),
+                    new Operator("Arriva", String.format("http://%s%d", OPERATOR_SERVICE_ID, 2))
             )
     );
 

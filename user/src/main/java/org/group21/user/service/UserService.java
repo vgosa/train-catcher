@@ -79,6 +79,9 @@ public class UserService {
     }
 
     public User topUpBalance(Long id, Double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
         user.setBalance(user.getBalance() + amount);

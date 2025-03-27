@@ -1,8 +1,7 @@
 package org.group21.trainsearch.controller;
 
-import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.*;
-import org.group21.*;
+import org.group21.annotations.RequiresAuthentication;
 import org.group21.trainsearch.model.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -36,26 +35,12 @@ public class UserProxyController {
     }
 
     @PostMapping("/{id}/topup")
+    @RequiresAuthentication
     public ResponseEntity<?> topUpUser(
             @PathVariable Integer id,
             @RequestBody Double amount,
-            @RequestHeader(name = "Authorization", required = false) String authHeader) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7);
-        DecodedJWT decoded;
-        try {
-            decoded = JwtUtil.verifyToken(token);
-        } catch (JWTVerificationException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token");
-        }
+            @RequestHeader(name = "Authorization", required = false) String authHeader,
+            DecodedJWT decoded) {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!tokenUserId.equals(id.longValue())) {
@@ -76,25 +61,11 @@ public class UserProxyController {
     }
 
     @GetMapping("/{id}")
+    @RequiresAuthentication
     public ResponseEntity<?> getUserById(
             @PathVariable Integer id,
-            @RequestHeader(name = "Authorization", required = false) String authHeader) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7);
-        DecodedJWT decoded;
-        try {
-            decoded = JwtUtil.verifyToken(token);
-        } catch (JWTVerificationException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token");
-        }
+            @RequestHeader(name = "Authorization", required = false) String authHeader,
+            DecodedJWT decoded) {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!tokenUserId.equals(id.longValue())) {

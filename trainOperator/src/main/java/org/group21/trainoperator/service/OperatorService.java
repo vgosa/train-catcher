@@ -29,6 +29,17 @@ public class OperatorService {
         return operatorRepository.save(operator);
     }
 
+    public Optional<Operator> topUpBalance(String operatorName, double amount) {
+        Optional<Operator> operator = operatorRepository.findByName(operatorName);
+        if (operator.isPresent()) {
+            Operator updatedOperator = operator.get();
+            updatedOperator.setBalance(updatedOperator.getBalance() + amount);
+            operatorRepository.save(updatedOperator);
+            return Optional.of(updatedOperator);
+        }
+        return Optional.empty();
+    }
+
     public Optional<Operator> topUpBalance(Long id, double amount) {
         Optional<Operator> operator = operatorRepository.findById(id);
         if (operator.isPresent()) {
@@ -39,6 +50,18 @@ public class OperatorService {
         }
         return Optional.empty();
     }
+
+    public Optional<Operator> deductBalance(String operatorName, double amount) {
+        Optional<Operator> operator = operatorRepository.findByName(operatorName);
+        if (operator.isPresent()) {
+            Operator updatedOperator = operator.get();
+            updatedOperator.setBalance(updatedOperator.getBalance() - amount);
+            operatorRepository.save(updatedOperator);
+            return Optional.of(updatedOperator);
+        }
+        return Optional.empty();
+    }
+
 
     public Optional<Operator> deductBalance(Long id, double amount) {
         Optional<Operator> operator = operatorRepository.findById(id);

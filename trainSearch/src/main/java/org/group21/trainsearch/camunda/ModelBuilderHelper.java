@@ -158,6 +158,22 @@ public class ModelBuilderHelper {
         return this;
     }
 
+    public ModelBuilderHelper triggerCompensationOnErrorWithoutEnd(String errorCode) {
+        saga = process.eventSubProcess()
+                .startEvent("CatchError-" + stringToID(errorCode))
+                .error(errorCode)
+                .intermediateThrowEvent("Compensate-" + stringToID(errorCode))
+                .compensateEventDefinition().compensateEventDefinitionDone();
+        return this;
+    }
+
+    public ModelBuilderHelper end(String name) {
+        saga = saga.endEvent("End-" + stringToID(name));
+        return this;
+    }
+
+
+
     /**
      * Allows to register listener to events and activities. Call it immediately after building an event or activity.
      *

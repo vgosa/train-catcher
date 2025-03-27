@@ -22,6 +22,7 @@ import java.util.Deque;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Slf4j
@@ -37,6 +38,8 @@ public class TicketPaymentWorkflow implements ExecutionListener {
     public static final String OPERATOR_CONTEXT_PATH = "/operator";
     private final ProcessEngine camunda;
 
+    @Getter
+    public AtomicBoolean wasUserCredited = new AtomicBoolean(false);
     @Getter
     private final Deque<PaymentJob> paymentJobs = new ConcurrentLinkedDeque<>();
 
@@ -61,6 +64,7 @@ public class TicketPaymentWorkflow implements ExecutionListener {
                 .triggerCompensationOnErrorWithoutEnd(DO_NOT_RETRY)
                 .activity("Compensate payment processing", PaymentCompensateProcessPayment.class)
                 .end("Compensation")
+                .addListener(ExecutionListener.EVENTNAME_END, this.getClass())
                 .build();
         camunda.getRepositoryService().createDeployment()
                 .addModelInstance(PAYMENT_WORKFLOW_NAME + ".bpmn", workflow)
@@ -90,8 +94,16 @@ public class TicketPaymentWorkflow implements ExecutionListener {
 
     public void addPaymentJob(PaymentJob job) {
         synchronized (paymentJobs) {
+            if (paymentJobs.stream()
+                    .anyMatch(e -> e.getOperatorName().equals(job.getOperatorName()))) {
+                return;
+            }
             paymentJobs.add(job);
         }
+    }
+
+    public void setWasUserCredited(boolean wasUserCredited) {
+        this.wasUserCredited.set(wasUserCredited);
     }
 
     @Data

@@ -55,6 +55,7 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
+                .intermediateCatchEvent("Wait for payment", "ChildProcessCompleted")
                 .activity("Send ticket via email", EmailSendTicket.class)
                 .endSuccess()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())

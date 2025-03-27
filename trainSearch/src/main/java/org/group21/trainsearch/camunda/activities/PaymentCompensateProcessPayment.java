@@ -34,8 +34,9 @@ public class PaymentCompensateProcessPayment implements JavaDelegate {
     public void execute(DelegateExecution execution) throws Exception {
         log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
 
-        if (ticketPaymentWorkflow.getPaymentJobs().isEmpty()) {
+        if (!ticketPaymentWorkflow.getWasUserCredited().get()) {
             log.info("User was not credited. No compensation is required.");
+            return;
         }
 
         Long userId = (Long) execution.getVariable(TicketPaymentWorkflow.VARIABLE_USER_ID);

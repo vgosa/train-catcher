@@ -4,16 +4,21 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.ws.rs.core.UriBuilder;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
+import org.group21.trainsearch.camunda.workflows.TicketPaymentWorkflow;
+import org.group21.trainsearch.model.Route;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -37,11 +42,12 @@ public class PaymentIssuePayment implements JavaDelegate {
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
         String paymentMethod = (String) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_PAYMENT_METHOD).getValue();
+        Route route = objectMapper.convertValue(execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE), Route.class);
         Long userId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER_ID).getValue();
         Long bookingId = (Long) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_BOOKING_ID).getValue();
 
-        if (paymentMethod == null || userId == null || bookingId == null) {
-            String errorMsg = "Payment method, User ID or Booking ID is null. Cannot issue payment!";
+        if (paymentMethod == null || route == null || userId == null || bookingId == null) {
+            String errorMsg = "Payment method, route, User ID or Booking ID is null. Cannot issue payment!";
             log.error(errorMsg);
             execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
@@ -81,5 +87,14 @@ public class PaymentIssuePayment implements JavaDelegate {
 
         execution.setVariable(TicketOrderWorkflow.VARIABLE_PAYMENT_ID, paymentId);
         log.info("Successfully issued payment. Payment ID: {}", paymentId);
+
+        log.info("Starting the ticket payment process instance");
+        RuntimeService runtimeService = execution.getProcessEngineServices().getRuntimeService();
+        runtimeService.startProcessInstanceByKey(TicketPaymentWorkflow.PAYMENT_WORKFLOW_NAME, Map.of(
+                TicketPaymentWorkflow.VARIABLE_USER_ID, userId,
+                TicketPaymentWorkflow.VARIABLE_ROUTE, route,
+                "parentProcessInstanceId", execution.getProcessInstanceId()
+        ));
+        execution.setVariable("childProcessStarted", true);
     }
 }

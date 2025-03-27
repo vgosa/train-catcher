@@ -172,6 +172,17 @@ public class ModelBuilderHelper {
         return this;
     }
 
+    public ModelBuilderHelper callActivity(String name, String processId) {
+        saga = saga.callActivity("CallActivity-" + stringToID(name))
+                .calledElement(processId);
+        return this;
+    }
+
+    public ModelBuilderHelper intermediateCatchEvent(String name, String messageName) {
+        saga = saga.intermediateCatchEvent("IntermediateCatchEvent-" + stringToID(name))
+                .message(messageName);
+        return this;
+    }
 
 
     /**

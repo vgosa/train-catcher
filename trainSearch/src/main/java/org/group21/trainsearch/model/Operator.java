@@ -18,6 +18,7 @@ public class Operator implements Serializable {
     @JsonIgnore
     private Long id;
     private String name;
+    @JsonIgnore
     private Double balance = 0.0;
     private String url;
 }

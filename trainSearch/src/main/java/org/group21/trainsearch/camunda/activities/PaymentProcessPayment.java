@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Component
@@ -79,6 +80,8 @@ public class PaymentProcessPayment implements JavaDelegate {
             execution.setVariable(TicketPaymentWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketPaymentWorkflow.DO_NOT_RETRY, errorMsg);
         }
+
+        ticketPaymentWorkflow.setWasUserCredited(true);
 
         Map<Operator, Double> operators = route.getJourneys().stream()
                 .collect(Collectors.groupingBy(Journey::getOperator, Collectors.summingDouble(Journey::getPrice)));

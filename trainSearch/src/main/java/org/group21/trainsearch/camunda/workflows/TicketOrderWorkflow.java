@@ -1,4 +1,4 @@
-package org.group21.trainsearch.camunda;
+package org.group21.trainsearch.camunda.workflows;
 
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
+import org.group21.trainsearch.camunda.ModelBuilderHelper;
 import org.group21.trainsearch.camunda.activities.*;
 import org.group21.trainsearch.model.Route;
 import org.springframework.stereotype.Service;
@@ -54,14 +55,15 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
+                .intermediateCatchEvent("Wait for payment", "ChildProcessCompleted")
                 .activity("Send ticket via email", EmailSendTicket.class)
-                .end()
+                .endSuccess()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .triggerCompensationOnError(DO_NOT_RETRY)
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .build();
         camunda.getRepositoryService().createDeployment()
-                .addModelInstance("buyTicket.bpmn", workflow)
+                .addModelInstance(ORDER_WORKFLOW_NAME + ".bpmn", workflow)
                 .deploy();
     }
 

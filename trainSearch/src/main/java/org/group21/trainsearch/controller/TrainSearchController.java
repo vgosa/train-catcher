@@ -1,10 +1,9 @@
 package org.group21.trainsearch.controller;
 
-import com.auth0.jwt.exceptions.*;
 import com.auth0.jwt.interfaces.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import org.group21.*;
+import org.group21.annotations.RequiresAuthentication;
 import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.service.*;
 import org.springframework.format.annotation.*;
@@ -22,6 +21,7 @@ public class TrainSearchController {
     private final TrainSearchService trainSearchService;
 
     private final RestTemplate restTemplate;
+
     public TrainSearchController(TrainSearchService trainSearchService, RestTemplate restTemplate) {
         this.trainSearchService = trainSearchService;
         this.restTemplate = restTemplate;
@@ -38,27 +38,13 @@ public class TrainSearchController {
         return ResponseEntity.ok(routes);
     }
 
-    @PostMapping("/camunda-test")
-    public ResponseEntity<String> camundaTest(
+    @PostMapping("/order")
+    @RequiresAuthentication
+    public ResponseEntity<String> orderTicket(
             @RequestBody @Valid Route route,
             @RequestParam("userId") @Min(0) Long userId,
-            @RequestHeader(name = "Authorization", required = false) String authHeader) {
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Missing or malformed Authorization header");
-        }
-
-        String token = authHeader.substring(7);
-        DecodedJWT decoded;
-        try {
-            decoded = JwtUtil.verifyToken(token);
-        } catch (JWTVerificationException e) {
-            return ResponseEntity
-                    .status(HttpStatus.UNAUTHORIZED)
-                    .body("Invalid or expired token");
-        }
+            @RequestHeader(name = "Authorization", required = false) String authHeader,
+            DecodedJWT decoded) {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!userId.equals(tokenUserId)) {
@@ -67,8 +53,25 @@ public class TrainSearchController {
                     .body("User ID in token does not match requested user ID");
         }
 
-        trainSearchService.testCamunda(userId, route);
+        trainSearchService.orderTicket(userId, route);
         return ResponseEntity.ok("Booking request sent successfully");
     }
 
+    @PostMapping("/camunda-test")
+    @RequiresAuthentication
+    public ResponseEntity<String> issuePayment(
+            @RequestBody @Valid Route route,
+            @RequestParam("userId") @Min(0) Long userId,
+            @RequestHeader(name = "Authorization", required = false) String authHeader,
+            DecodedJWT decoded) {
+        Long tokenUserId = decoded.getClaim("userId").asLong();
+        if (!userId.equals(tokenUserId)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body("User ID in token does not match requested user ID");
+        }
+
+        trainSearchService.camundaTest(userId, route);
+        return ResponseEntity.ok("Payment request sent successfully");
+    }
 }

@@ -88,5 +88,18 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    public User deductBalance(Long id, Double amount) {
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be positive");
+        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+        if (user.getBalance() < amount) {
+            throw new IllegalArgumentException("Insufficient balance");
+        }
+        user.setBalance(user.getBalance() - amount);
+        return userRepository.save(user);
+    }
+
 
 }

@@ -6,7 +6,7 @@ import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.group21.trainsearch.camunda.TicketOrderWorkflow;
+import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.group21.trainsearch.model.Ticket;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

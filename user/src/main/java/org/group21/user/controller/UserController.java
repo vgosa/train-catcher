@@ -98,7 +98,14 @@ public class UserController {
         return ResponseEntity.ok(updated.getBalance());
     }
 
+    @PostMapping("/{id}/deduct")
+    public ResponseEntity<Double> deductUser(
+            @PathVariable Long id,
+            @RequestBody Double amount) {
 
+        User updated = userService.deductBalance(id, amount);
+        return ResponseEntity.ok(updated.getBalance());
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){

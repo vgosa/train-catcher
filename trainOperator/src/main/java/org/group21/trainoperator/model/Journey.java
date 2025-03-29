@@ -37,4 +37,7 @@ public class Journey {
 
     @Column(name = "occupied_seats", nullable = false)
     private Integer occupiedSeats;
+
+    @Column(name = "blocked_seats", nullable = false)
+    private Integer blockedSeats = 0;
 }

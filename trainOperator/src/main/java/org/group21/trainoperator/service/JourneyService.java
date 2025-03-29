@@ -45,4 +45,39 @@ public class JourneyService {
     public void deleteJourney(Long id) {
         journeyRepository.deleteById(id);
     }
+
+    public boolean blockSeat(Long journeyId) {
+        Journey journey = journeyRepository.findById(journeyId)
+                .orElseThrow(() -> new RuntimeException("Journey not found"));
+        if ((journey.getOccupiedSeats() + journey.getBlockedSeats()) < journey.getTrain().getSeats()) {
+            journey.setBlockedSeats(journey.getBlockedSeats() + 1);
+            journeyRepository.save(journey);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean confirmSeat(Long journeyId) {
+        Journey journey = journeyRepository.findById(journeyId)
+                .orElseThrow(() -> new RuntimeException("Journey not found"));
+        if (journey.getBlockedSeats() > 0) {
+            journey.setBlockedSeats(journey.getBlockedSeats() - 1);
+            journey.setOccupiedSeats(journey.getOccupiedSeats() + 1);
+            journeyRepository.save(journey);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean cancelSeat(Long journeyId) {
+        Journey journey = journeyRepository.findById(journeyId)
+                .orElseThrow(() -> new RuntimeException("Journey not found"));
+        if (journey.getBlockedSeats() > 0) {
+            journey.setBlockedSeats(journey.getBlockedSeats() - 1);
+            journeyRepository.save(journey);
+            return true;
+        }
+        return false;
+    }
+
 }

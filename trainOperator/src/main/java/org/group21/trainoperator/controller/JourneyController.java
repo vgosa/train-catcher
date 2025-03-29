@@ -58,4 +58,34 @@ public class JourneyController {
         journeyService.deleteJourney(journeyId);
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/{journeyId}/block")
+    public ResponseEntity<Void> blockSeat(@PathVariable Long journeyId) {
+        boolean success = journeyService.blockSeat(journeyId);
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @PostMapping("/{journeyId}/confirm")
+    public ResponseEntity<Void> confirmSeat(@PathVariable Long journeyId) {
+        boolean success = journeyService.confirmSeat(journeyId);
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
+
+    @PostMapping("/{journeyId}/cancel")
+    public ResponseEntity<Void> cancelSeat(@PathVariable Long journeyId) {
+        boolean success = journeyService.cancelSeat(journeyId);
+        if (success) {
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
+    }
 }

@@ -12,7 +12,7 @@ import org.group21.trainsearch.camunda.listeners.PaymentProcessListener;
 import org.group21.trainsearch.model.Route;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -52,11 +52,14 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .start()
                 .activity("Create booking", BookingCreateBooking.class)
                 .compensationActivity("Compensate booking creation", BookingCompensateCreateBooking.class)
+                .activity("Reserve seats", SeatBookingBlockSeats.class)
+                .compensationActivity("Cancel reserved seats", SeatBookingCancelSeats.class)
                 .activity("Create ticket for booking", TicketCreateTicket.class)
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
                 .receiveTask("Wait for payment", "ChildProcessCompleted")
+                .activity("Confirm booked seats", SeatBookingConfirmSeats.class)
                 .activity("Send ticket via email", EmailSendTicket.class)
                 .endSuccess()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())

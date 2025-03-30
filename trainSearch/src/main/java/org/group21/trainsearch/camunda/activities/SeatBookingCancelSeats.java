@@ -19,6 +19,8 @@ public class SeatBookingCancelSeats implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
+        Long bookingId = (Long) execution.getVariable("bookingId");
+        log.info("Compensating seat reservation for bookingId: {}", bookingId);
         Route route = (Route) execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE);
         if (route == null || route.getJourneys() == null) {
             String errorMsg = "No route or journeys found in execution variables for cancellation.";

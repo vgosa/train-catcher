@@ -1,5 +1,6 @@
 package org.group21.trainsearch.camunda.activities;
 
+import com.fasterxml.jackson.databind.*;
 import lombok.extern.slf4j.*;
 import org.camunda.bpm.engine.delegate.*;
 import org.group21.trainsearch.camunda.workflows.*;
@@ -9,23 +10,34 @@ import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
 @Slf4j
-@Service
+@Component
 public class SeatBookingBlockSeats implements JavaDelegate{
 
+    private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
 
-    public SeatBookingBlockSeats(RestTemplate restTemplate) {
+    public SeatBookingBlockSeats(ObjectMapper objectMapper, RestTemplate restTemplate) {
+        this.objectMapper = objectMapper;
         this.restTemplate = restTemplate;
     }
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         log.info("Entering SeatBookingBlockSeats delegate.");
-        Route route = (Route) execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE);
-        if (route == null || route.getJourneys() == null) {
-            String errorMsg = "No route or journeys found in execution variables.";
+        Route route;
+        try {
+            route = objectMapper.convertValue(execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE), Route.class);
+        } catch (IllegalArgumentException e) {
+            String errorMsg = "Failed to convert route from execution variables";
+            log.error(errorMsg, e);
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
+        if (route == null) {
+            String errorMsg = "Route is null";
             log.error(errorMsg);
-            throw new BpmnError("BlockSeatsError", errorMsg);
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
         for (Journey journey : route.getJourneys()) {
             String operatorUrl = journey.getOperator().getUrl();

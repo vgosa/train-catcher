@@ -8,7 +8,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
 @Slf4j
-@Service
+@Component
 public class SeatBookingConfirmSeats implements JavaDelegate {
     private final RestTemplate restTemplate;
 
@@ -18,6 +18,7 @@ public class SeatBookingConfirmSeats implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
+        log.info("Entering SeatBookingConfirmSeats delegate.");
         Route route = (Route) execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE);
         if (route == null || route.getJourneys() == null) {
             String errorMsg = "No route or journeys found in execution variables for confirmation.";

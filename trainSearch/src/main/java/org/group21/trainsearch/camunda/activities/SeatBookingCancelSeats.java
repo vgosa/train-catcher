@@ -9,7 +9,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.client.*;
 
 @Slf4j
-@Service
+@Component
 public class SeatBookingCancelSeats implements JavaDelegate {
     private final RestTemplate restTemplate;
 

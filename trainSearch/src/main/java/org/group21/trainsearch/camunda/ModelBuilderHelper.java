@@ -184,6 +184,12 @@ public class ModelBuilderHelper {
         return this;
     }
 
+    public ModelBuilderHelper receiveTask(String name, String messageName) {
+        saga = saga.receiveTask("ReceiveTask-" + stringToID(name))
+                .message(messageName);
+        return this;
+    }
+
 
     /**
      * Allows to register listener to events and activities. Call it immediately after building an event or activity.

@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.group21.trainsearch.camunda.ModelBuilderHelper;
 import org.group21.trainsearch.camunda.activities.*;
+import org.group21.trainsearch.camunda.listeners.PaymentProcessListener;
 import org.group21.trainsearch.model.Route;
 import org.springframework.stereotype.Service;
 
@@ -51,14 +52,11 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .start()
                 .activity("Create booking", BookingCreateBooking.class)
                 .compensationActivity("Compensate booking creation", BookingCompensateCreateBooking.class)
-                .activity("Seat Reservation", SeatBookingBlockSeats.class)
-                .compensationActivity("Compensate seat reservation", SeatBookingCancelSeats.class)
                 .activity("Create ticket for booking", TicketCreateTicket.class)
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
-                .intermediateCatchEvent("Wait for payment", "ChildProcessCompleted")
-                .activity("Confirm seats", SeatBookingConfirmSeats.class)
+                .receiveTask("Wait for payment", "ChildProcessCompleted")
                 .activity("Send ticket via email", EmailSendTicket.class)
                 .endSuccess()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())

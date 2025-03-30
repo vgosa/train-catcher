@@ -9,10 +9,12 @@ import java.time.*;
 @NoArgsConstructor
 public class Journey {
     private Long id;
+    private Train train;
     private String departureStation;
     private String arrivalStation;
     private LocalDateTime departureTime;
     private Integer travelTime;
     private Double price;
+    private Integer occupiedSeats;
     private Operator operator;
 }

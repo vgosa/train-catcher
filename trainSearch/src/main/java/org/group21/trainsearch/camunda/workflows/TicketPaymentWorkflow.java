@@ -89,6 +89,7 @@ public class TicketPaymentWorkflow implements ExecutionListener {
             log.error("The job failed to execute. Reason: {}", execution.getVariable(FAILURE_REASON));
         } else {
             log.info("The job was successfully executed.");
+            execution.getProcessEngine().getRuntimeService().correlateMessage("ChildProcessCompleted");
         }
     }
 

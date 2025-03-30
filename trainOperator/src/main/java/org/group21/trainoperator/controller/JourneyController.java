@@ -61,6 +61,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/block")
     public ResponseEntity<Void> blockSeat(@PathVariable Long journeyId) {
+        System.out.println("Blocking");
         boolean success = journeyService.blockSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();
@@ -71,6 +72,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/confirm")
     public ResponseEntity<Void> confirmSeat(@PathVariable Long journeyId) {
+        System.out.println("Confirming");
         boolean success = journeyService.confirmSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();
@@ -81,6 +83,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/cancel")
     public ResponseEntity<Void> cancelSeat(@PathVariable Long journeyId) {
+        System.out.println("Cancelling");
         boolean success = journeyService.cancelSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();

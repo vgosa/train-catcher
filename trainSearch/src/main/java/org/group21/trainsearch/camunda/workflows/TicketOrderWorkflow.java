@@ -51,6 +51,7 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .start()
                 .activity("Create booking", BookingCreateBooking.class)
                 .compensationActivity("Compensate booking creation", BookingCompensateCreateBooking.class)
+                .callActivity("Seat Reservation", SeatBookingWorkflow.SEAT_WORKFLOW_NAME)
                 .activity("Create ticket for booking", TicketCreateTicket.class)
                 .compensationActivity("Compensate ticket creation", TicketCompensateCreateTicket.class)
                 .activity("Issue payment", PaymentIssuePayment.class)

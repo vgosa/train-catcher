@@ -11,6 +11,7 @@
     if (!localStorage.getItem("token")) {
         window.location.href = "/";
     }
+
     function logout() {
         localStorage.clear();
         window.location.href = "/";
@@ -45,7 +46,13 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th>#</th><th>Departure</th><th>Arrival</th><th>Time</th><th>Duration</th><th>Price</th><th>Operator</th>
+                            <th>#</th>
+                            <th>Departure</th>
+                            <th>Arrival</th>
+                            <th>Time</th>
+                            <th>Duration</th>
+                            <th>Price</th>
+                            <th>Operator</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -94,14 +101,18 @@
         const id = localStorage.getItem("userId"), token = localStorage.getItem("token");
         if (!id || !token) return;
         const resp = await fetch(`/user/${id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+            headers: {'Authorization': `Bearer ${token}`}
         });
         if (resp.ok) {
             const user = await resp.json();
             document.getElementById("userInfo").innerText =
-                `Welcome, ${user.firstName} ${user.lastName} — Balance: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(user.balance)}`;
+                `Welcome, ${user.firstName} ${user.lastName} — Balance: ${new Intl.NumberFormat('nl-NL', {
+                    style: 'currency',
+                    currency: 'EUR'
+                }).format(user.balance)}`;
         }
     }
+
     loadUserInfo();
 
     document.getElementById('topUpForm').addEventListener('submit', async e => {
@@ -118,11 +129,50 @@
         });
         if (!resp.ok) throw new Error(await resp.text());
         const newBalance = await resp.json();
-        alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(newBalance)}`);
+        alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', {
+            style: 'currency',
+            currency: 'EUR'
+        }).format(newBalance)}`);
         document.getElementById("topUpAmount").value = '';
         bootstrap.Modal.getInstance(document.getElementById('topUpModal')).hide();
         loadUserInfo();
     });
+</script>
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    var routesData = [[${routes}]];
+    /*]]>*/
+</script>
+<script>
+    function bookRoute(index) {
+        var route = routesData[index];
+        var userId = localStorage.getItem("userId");
+        if (!userId) {
+            alert("User ID not found. Please log in again.");
+            window.location.href = "/";
+            return;
+        }
+        fetch("/search/camunda-test?userId=" + encodeURIComponent(userId), {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + localStorage.getItem("token")
+            },
+            body: JSON.stringify(route)
+        })
+            .then(function (response) {
+                if (response.ok) {
+                    alert("Booking request successfully sent!");
+                } else {
+                    return response.text().then(function (text) {
+                        throw new Error(text);
+                    });
+                }
+            })
+            .catch(function (error) {
+                alert("Booking failed: " + error.message);
+            });
+    }
 </script>
 </body>
 </html>

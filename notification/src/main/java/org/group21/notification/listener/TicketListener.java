@@ -39,7 +39,7 @@ public class TicketListener {
             String body = createTicketEmailBody(ticket);
             emailService.sendEmail(ticket.getEmail(), subject, body);
         } catch (MailException e) {
-            log.error("Error processing ticket notification. CAUSE: Could not send the email confirmation!");
+            log.error("Error processing ticket notification. CAUSE: Could not send the email confirmation!", e);
         } catch (JsonProcessingException e) {
             log.error("Error processing ticket notification. CAUSE: Could not read the dequeued message! The contents are: \n {}", message);
             log.error(e.getMessage());

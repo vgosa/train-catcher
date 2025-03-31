@@ -4,6 +4,7 @@ import com.auth0.jwt.interfaces.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.group21.annotations.RequiresAuthentication;
+import org.group21.exception.UnauthorizedException;
 import org.group21.trainsearch.model.*;
 import org.group21.trainsearch.service.*;
 import org.springframework.format.annotation.*;
@@ -48,9 +49,7 @@ public class TrainSearchController {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!userId.equals(tokenUserId)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("User ID in token does not match requested user ID");
+            throw new UnauthorizedException("User ID in token does not match requested user ID");
         }
 
         trainSearchService.orderTicket(userId, route);
@@ -66,9 +65,7 @@ public class TrainSearchController {
             DecodedJWT decoded) {
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!userId.equals(tokenUserId)) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("User ID in token does not match requested user ID");
+            throw new UnauthorizedException("User ID in token does not match requested user ID");
         }
 
         trainSearchService.camundaTest(userId, route);

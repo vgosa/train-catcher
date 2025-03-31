@@ -1,5 +1,6 @@
 package org.group21.booking.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.group21.booking.model.Booking;
 import org.group21.booking.model.Route;
@@ -29,7 +30,7 @@ public class BookingService {
     public Booking updateBooking(long bookingId, Booking booking) {
         Optional<Booking> bookingOpt = bookingRepository.findById(bookingId);
         if (bookingOpt.isEmpty()) {
-            throw new RuntimeException("Could not find a booking with ID: " + bookingId);
+            throw new EntityNotFoundException("Could not find a booking with ID: " + bookingId);
         }
         return bookingRepository.save(booking);
     }

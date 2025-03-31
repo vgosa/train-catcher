@@ -1,12 +1,15 @@
 package org.group21.trainoperator.controller;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.group21.exception.StateConflictException;
+import org.group21.exception.UnauthenticatedException;
+import org.group21.exception.UnauthorizedException;
 import org.group21.trainoperator.model.*;
 import org.group21.trainoperator.service.*;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -45,7 +48,7 @@ public class JourneyController {
     public ResponseEntity<Journey> getJourneyById(@PathVariable("journeyId") Long journeyId) {
         Optional<Journey> journeyOpt = journeyService.getJourneyById(journeyId);
         return journeyOpt.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new EntityNotFoundException("Journey with id " + journeyId + " was not found"));
     }
 
     @PutMapping("/{journeyId}")
@@ -68,7 +71,7 @@ public class JourneyController {
         if (success) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new StateConflictException("All seats are occupied. Could not block a seat for " + journeyId);
         }
     }
 
@@ -79,7 +82,8 @@ public class JourneyController {
         if (success) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new StateConflictException("Could not confirm seat for journey " + journeyId +
+                    " because no seat was blocked.");
         }
     }
 
@@ -90,7 +94,8 @@ public class JourneyController {
         if (success) {
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            throw new StateConflictException("Could not cancel seat for journey " + journeyId +
+                    " because no seat was blocked.");
         }
     }
 }

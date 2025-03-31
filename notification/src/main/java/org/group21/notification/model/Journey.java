@@ -1,4 +1,5 @@
 package org.group21.notification.model;
+import com.fasterxml.jackson.annotation.*;
 import lombok.*;
 
 import java.time.*;
@@ -7,6 +8,7 @@ import java.time.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Journey {
     private Long id;
     private Train train;

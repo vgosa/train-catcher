@@ -1,5 +1,6 @@
 package org.group21.booking.model;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.group21.booking.model.converter.RouteAttributeConverter;

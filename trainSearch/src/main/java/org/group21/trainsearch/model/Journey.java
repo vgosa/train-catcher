@@ -19,5 +19,6 @@ public class Journey implements Serializable {
     private Integer travelTime;
     private Double price;
     private Integer occupiedSeats;
+    private Integer blockedSeats;
     private Operator operator;
 }

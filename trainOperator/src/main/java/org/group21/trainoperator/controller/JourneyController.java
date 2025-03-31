@@ -1,6 +1,7 @@
 package org.group21.trainoperator.controller;
 
 import jakarta.persistence.*;
+import lombok.extern.slf4j.Slf4j;
 import org.group21.trainoperator.model.*;
 import org.group21.trainoperator.service.*;
 import org.springframework.beans.factory.annotation.*;
@@ -13,6 +14,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping("/journey")
+@Slf4j
 public class JourneyController {
 
     private final JourneyService journeyService;
@@ -61,7 +63,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/block")
     public ResponseEntity<Void> blockSeat(@PathVariable Long journeyId) {
-        System.out.println("Blocking");
+        log.info("Blocking a seat for journey {}", journeyId);
         boolean success = journeyService.blockSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();
@@ -72,7 +74,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/confirm")
     public ResponseEntity<Void> confirmSeat(@PathVariable Long journeyId) {
-        System.out.println("Confirming");
+        log.info("Confirming a seat for journey {}", journeyId);
         boolean success = journeyService.confirmSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();
@@ -83,7 +85,7 @@ public class JourneyController {
 
     @PostMapping("/{journeyId}/cancel")
     public ResponseEntity<Void> cancelSeat(@PathVariable Long journeyId) {
-        System.out.println("Cancelling");
+        log.info("Cancelling a seat for journey {}", journeyId);
         boolean success = journeyService.cancelSeat(journeyId);
         if (success) {
             return ResponseEntity.ok().build();

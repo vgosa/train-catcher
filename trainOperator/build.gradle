@@ -28,7 +28,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.cloud:spring-cloud-starter-consul-config'
 	implementation 'org.springframework.cloud:spring-cloud-starter-consul-discovery'
-	implementation 'org.group21:common-utils:1.0.1'
+	implementation 'org.group21:common-utils:1.0.2'
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

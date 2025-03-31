@@ -32,6 +32,7 @@ public class BookingService {
         if (bookingOpt.isEmpty()) {
             throw new EntityNotFoundException("Could not find a booking with ID: " + bookingId);
         }
+        booking.setId(bookingId);
         return bookingRepository.save(booking);
     }
 

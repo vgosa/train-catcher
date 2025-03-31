@@ -42,6 +42,10 @@ public class JourneyService {
     }
 
     public Journey updateJourney(Long id, Journey journey) {
+        if (!journeyRepository.existsById(id)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE);
+        }
+        journey.setId(id);
         return journeyRepository.save(journey);
     }
 

@@ -1,19 +1,19 @@
 package org.group21.trainoperator.controller;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.group21.exception.StateConflictException;
-import org.group21.exception.UnauthenticatedException;
-import org.group21.exception.UnauthorizedException;
-import org.group21.trainoperator.model.*;
-import org.group21.trainoperator.service.*;
+import org.group21.trainoperator.model.Journey;
+import org.group21.trainoperator.service.JourneyService;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.*;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/journey")
@@ -39,7 +39,7 @@ public class JourneyController {
     }
 
     @PostMapping
-    public ResponseEntity<Journey> addJourney(@RequestBody Journey journey) {
+    public ResponseEntity<Journey> addJourney(@RequestBody @Valid Journey journey) {
         Journey createdJourney = journeyService.addJourney(journey);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdJourney);
     }
@@ -53,7 +53,7 @@ public class JourneyController {
 
     @PutMapping("/{journeyId}")
     public ResponseEntity<Journey> updateJourney(@PathVariable("journeyId") Long journeyId,
-                                                 @RequestBody Journey journey) {
+                                                 @RequestBody @Valid Journey journey) {
         Journey updatedJourney = journeyService.updateJourney(journeyId, journey);
         return ResponseEntity.ok(updatedJourney);
     }

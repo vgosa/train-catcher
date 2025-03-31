@@ -31,6 +31,7 @@ public class TicketService {
         if (ticketOpt.isEmpty()) {
             throw new EntityNotFoundException("Could not find a ticket with ID: " + ticketId);
         }
+        ticket.setId(ticketId);
         return ticketRepository.save(ticket);
     }
 

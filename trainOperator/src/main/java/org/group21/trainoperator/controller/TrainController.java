@@ -1,5 +1,6 @@
 package org.group21.trainoperator.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.group21.trainoperator.model.Train;
@@ -37,7 +38,7 @@ public class TrainController {
     @GetMapping("/{trainId}")
     public ResponseEntity<Train> getTrainById(@PathVariable("trainId") @Min(0) Long trainId) {
         Optional<Train> trainOpt = trainService.getTrainById(trainId);
-        return trainOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return trainOpt.map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("Train not found"));
     }
 
     @PutMapping("/{trainId}")

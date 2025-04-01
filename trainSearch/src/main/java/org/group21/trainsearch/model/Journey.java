@@ -1,11 +1,11 @@
 package org.group21.trainsearch.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor

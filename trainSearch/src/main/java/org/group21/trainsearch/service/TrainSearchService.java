@@ -3,14 +3,18 @@ package org.group21.trainsearch.service;
 import lombok.extern.slf4j.Slf4j;
 import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.group21.trainsearch.camunda.workflows.TicketPaymentWorkflow;
-import org.group21.trainsearch.model.*;
-import org.group21.trainsearch.util.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.*;
-import org.springframework.web.client.*;
+import org.group21.trainsearch.model.Journey;
+import org.group21.trainsearch.model.Operator;
+import org.group21.trainsearch.model.Route;
+import org.group21.trainsearch.util.RouteAggregator;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
-import java.time.*;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j

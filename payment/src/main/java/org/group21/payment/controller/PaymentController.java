@@ -1,5 +1,6 @@
 package org.group21.payment.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +38,6 @@ public class PaymentController {
     @GetMapping("/{paymentId}")
     public ResponseEntity<Payment> getPaymentById(@PathVariable("paymentId") @Min(0) Long paymentId) {
         Optional<Payment> paymentOpt = paymentService.getPaymentById(paymentId);
-        return paymentOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return paymentOpt.map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("Payment with id " + paymentId + " not found"));
     }
 }

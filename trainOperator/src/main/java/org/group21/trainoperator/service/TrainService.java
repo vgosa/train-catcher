@@ -1,5 +1,6 @@
 package org.group21.trainoperator.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.group21.trainoperator.model.Train;
 import org.group21.trainoperator.repository.TrainRepository;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,9 @@ public class TrainService {
     }
 
     public Train updateTrain(Long id, Train train) {
+        if (!trainRepository.existsById(id)) {
+            throw new EntityNotFoundException("Train with id " + id + " not found");
+        }
         train.setId(id);
         return trainRepository.save(train);
     }

@@ -1,5 +1,6 @@
 package org.group21.booking.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -33,20 +34,14 @@ public class BookingController {
     @GetMapping("/{bookingId}")
     public ResponseEntity<Booking> getBookingById(@PathVariable("bookingId") @Min(0) Long bookingId) {
         Optional<Booking> bookingOpt = bookingService.getBookingById(bookingId);
-        return bookingOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return bookingOpt.map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("Booking not found"));
     }
 
     @PutMapping("/{bookingId}")
     public ResponseEntity<Booking> updateBooking(@PathVariable("bookingId") @Min(0) Long bookingId,
                                                  @Valid @RequestBody Booking booking) {
-        try {
-            Booking updatedBooking = bookingService.updateBooking(bookingId, booking);
-            return ResponseEntity.ok(updatedBooking);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage(), e);
-        }
-        return ResponseEntity.badRequest().build();
-
+        Booking updatedBooking = bookingService.updateBooking(bookingId, booking);
+        return ResponseEntity.ok(updatedBooking);
     }
 
     @DeleteMapping("/{bookingId}")

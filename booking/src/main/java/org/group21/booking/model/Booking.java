@@ -1,6 +1,8 @@
 package org.group21.booking.model;
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import org.group21.booking.model.converter.RouteAttributeConverter;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -25,6 +27,7 @@ public class Booking {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
+    @Min(0)
     private Long userId;
 
     @Convert(converter = RouteAttributeConverter.class)
@@ -33,5 +36,6 @@ public class Booking {
     private Route route;
 
     @Column(name = "price", nullable = false)
+    @Min(0)
     private Double price;
 }

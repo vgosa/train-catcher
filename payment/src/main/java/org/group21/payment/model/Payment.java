@@ -1,6 +1,7 @@
 package org.group21.payment.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,9 +26,11 @@ public class Payment {
     private long id;
 
     @Column(name = "user_id", nullable = false)
+    @Min(0)
     private long userId;
 
     @Column(name = "booking_id", nullable = false)
+    @Min(0)
     private long bookingId;
 
     @Enumerated(EnumType.STRING)

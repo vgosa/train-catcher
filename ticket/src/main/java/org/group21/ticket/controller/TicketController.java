@@ -1,5 +1,6 @@
 package org.group21.ticket.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
@@ -32,19 +33,14 @@ public class TicketController {
     @GetMapping("/{ticketId}")
     public ResponseEntity<Ticket> getTicketById(@PathVariable("ticketId") @Min(0) long ticketId) {
         Optional<Ticket> ticketOpt = ticketService.getTicketById(ticketId);
-        return ticketOpt.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        return ticketOpt.map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("Could not find a ticket with ID: " + ticketId));
     }
 
     @PutMapping("/{ticketId}")
     public ResponseEntity<Ticket> updateTicket(@PathVariable("ticketId") @Min(0) long ticketId,
                                                @RequestBody @Valid Ticket ticket) {
-        try {
-            Ticket updatedTicket = ticketService.updateTicket(ticketId, ticket);
-            return ResponseEntity.ok(updatedTicket);
-        } catch (MissingResourceException e) {
-            log.error(e.getMessage(), e);
-        }
-        return ResponseEntity.badRequest().build();
+        Ticket updatedTicket = ticketService.updateTicket(ticketId, ticket);
+        return ResponseEntity.ok(updatedTicket);
     }
 
     @DeleteMapping("/{ticketId}")

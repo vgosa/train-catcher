@@ -14,5 +14,6 @@ CREATE TABLE journey (
                          departure_time TIMESTAMP NOT NULL,
                          travel_time INT NOT NULL, -- duration in minutes
                          price NUMERIC(10, 2) NOT NULL,
-                         occupied_seats INT NOT NULL
+                         occupied_seats INT NOT NULL,
+                         blocked_seats INT NOT NULL
 );

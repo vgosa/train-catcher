@@ -1,6 +1,7 @@
 package org.group21.notification.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.group21.notification.exception.MailServerUnavailableException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
@@ -44,7 +45,7 @@ public class EmailService {
 
     public void sendEmail(String recipient, String subject, String text) throws MailException {
         if (!isMailServerAvailable()) {
-            throw new RuntimeException("Mail service is down. Email not sent.");
+            throw new MailServerUnavailableException("Mail service is down. Email not sent.");
         }
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(recipient);

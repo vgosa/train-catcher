@@ -2,6 +2,7 @@ package org.group21.trainsearch.controller;
 
 import com.auth0.jwt.interfaces.*;
 import org.group21.annotations.RequiresAuthentication;
+import org.group21.exception.UnauthorizedException;
 import org.group21.trainsearch.model.*;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -44,9 +45,7 @@ public class UserProxyController {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!tokenUserId.equals(id.longValue())) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("User ID in token does not match requested user ID");
+            throw new UnauthorizedException("User ID in token does not match requested user ID");
         }
 
         String url = "http://user/user/" + id + "/topup";
@@ -69,9 +68,7 @@ public class UserProxyController {
 
         Long tokenUserId = decoded.getClaim("userId").asLong();
         if (!tokenUserId.equals(id.longValue())) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body("User ID in token does not match requested user ID");
+            throw new UnauthorizedException("User ID in token does not match requested user ID");
         }
 
         String url = "http://user/user/" + id;

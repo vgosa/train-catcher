@@ -3,6 +3,7 @@ package org.group21.user.service;
 
 import jakarta.persistence.*;
 import org.group21.JwtUtil;
+import org.group21.exception.StateConflictException;
 import org.group21.user.exception.InvalidCredentialsException;
 import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
@@ -10,6 +11,7 @@ import org.group21.user.repository.*;
 import org.group21.user.util.*;
 import org.springframework.stereotype.*;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.*;
 
 @Service
@@ -83,7 +85,7 @@ public class UserService {
             throw new IllegalArgumentException("Amount must be positive");
         }
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found", id));
         user.setBalance(user.getBalance() + amount);
         return userRepository.save(user);
     }
@@ -93,9 +95,9 @@ public class UserService {
             throw new IllegalArgumentException("Amount must be positive");
         }
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found: " + id));
+                .orElseThrow(() -> new UserNotFoundException("User not found", id));
         if (user.getBalance() < amount) {
-            throw new IllegalArgumentException("Insufficient balance");
+            throw new StateConflictException("Insufficient balance");
         }
         user.setBalance(user.getBalance() - amount);
         return userRepository.save(user);

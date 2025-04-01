@@ -10,15 +10,14 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
-import org.group21.trainsearch.camunda.workflows.TicketPaymentWorkflow;
+import org.group21.trainsearch.camunda.workflows.*;
 import org.group21.trainsearch.model.Route;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -96,5 +95,11 @@ public class PaymentIssuePayment implements JavaDelegate {
                 "parentProcessInstanceId", execution.getProcessInstanceId()
         ));
         execution.setVariable("childProcessStarted", true);
+
+        log.info("About to send PaymentOutcomeSignal to seat booking workflow.");
+        Map<String, Object> signalVariables = new HashMap<>();
+        signalVariables.put(SeatBookingWorkflow.PAYMENT_SUCCESS_VARIABLE, true); // or false on failure
+        runtimeService.signalEventReceived("PaymentOutcomeSignal", signalVariables);
+        log.info("PaymentOutcomeSignal sent with variables: {}", signalVariables);
     }
 }

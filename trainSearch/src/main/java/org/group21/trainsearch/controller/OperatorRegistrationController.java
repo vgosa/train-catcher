@@ -1,5 +1,6 @@
 package org.group21.trainsearch.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.group21.trainsearch.service.*;
 import org.group21.trainsearch.model.*;
 import org.springframework.http.*;
@@ -35,7 +36,7 @@ public class OperatorRegistrationController {
         if (removed) {
             return ResponseEntity.ok("Operator removed successfully");
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Operator not found");
+            throw new EntityNotFoundException("Operator not found");
         }
     }
 }

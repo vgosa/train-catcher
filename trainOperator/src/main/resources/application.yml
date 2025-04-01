@@ -1,6 +1,6 @@
 spring:
     application:
-        name: trainOperator1
+        name: trainOperator
     config:
         import: "optional:consul:"
     cloud:

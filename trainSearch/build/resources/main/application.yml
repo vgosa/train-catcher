@@ -2,10 +2,10 @@ spring:
   application:
     name: trainSearch
   config:
-    import: "consul:"
+    import: "optional:consul:"
   cloud:
     consul:
-      host: localhost
+      host: consul
       port: 8500
       discovery:
         healthCheckInterval: 1s

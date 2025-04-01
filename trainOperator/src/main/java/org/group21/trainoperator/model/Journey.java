@@ -1,6 +1,8 @@
 package org.group21.trainoperator.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.*;
@@ -21,23 +23,29 @@ public class Journey {
     private Train train;
 
     @Column(name = "departure_station", nullable = false)
+    @NotBlank
     private String departureStation;
 
     @Column(name = "arrival_station", nullable = false)
+    @NotBlank
     private String arrivalStation;
 
     @Column(name = "departure_time", nullable = false)
     private LocalDateTime departureTime;
 
     @Column(name = "travel_time", nullable = false)
+    @Min(0)
     private Integer travelTime;  // in minutes
 
     @Column(nullable = false)
+    @Min(0)
     private Double price;
 
     @Column(name = "occupied_seats", nullable = false)
+    @Min(0)
     private Integer occupiedSeats;
 
     @Column(name = "blocked_seats", nullable = false)
+    @Min(0)
     private Integer blockedSeats = 0;
 }

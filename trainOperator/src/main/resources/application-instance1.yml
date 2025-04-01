@@ -25,3 +25,8 @@ spring:
     driver-class-name: org.h2.Driver
 server:
   port: 8090
+
+# If you want to see detailed logs
+#logging:
+#  level:
+#    root: debug

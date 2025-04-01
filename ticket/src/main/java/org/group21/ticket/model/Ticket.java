@@ -1,6 +1,7 @@
 package org.group21.ticket.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,9 +24,11 @@ public class Ticket {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
+    @Min(0)
     private Long userId;
 
     @Column(name = "booking_id", nullable = false)
+    @Min(0)
     private Long bookingId;
 
     @Column(name = "isValid", nullable = false)

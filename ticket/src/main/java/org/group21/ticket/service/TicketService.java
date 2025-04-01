@@ -1,5 +1,6 @@
 package org.group21.ticket.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.group21.ticket.model.Ticket;
 import org.group21.ticket.repository.TicketRepository;
 import org.springframework.stereotype.Service;
@@ -25,12 +26,12 @@ public class TicketService {
         return ticketRepository.save(ticket);
     }
 
-    public Ticket updateTicket(long ticketId, Ticket ticket) throws MissingResourceException{
+    public Ticket updateTicket(long ticketId, Ticket ticket) {
         Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
         if (ticketOpt.isEmpty()) {
-            throw new MissingResourceException("Could not find a ticket with ID: " + ticketId,
-                    Ticket.RESOURCE_NAME, String.valueOf(ticketId));
+            throw new EntityNotFoundException("Could not find a ticket with ID: " + ticketId);
         }
+        ticket.setId(ticketId);
         return ticketRepository.save(ticket);
     }
 

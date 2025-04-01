@@ -27,6 +27,6 @@ server:
   port: 8092
 
 # If you want to see detailed logs
-#logging:
-#  level:
-#    root: debug
+logging:
+  level:
+    root: debug

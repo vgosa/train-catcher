@@ -1,5 +1,6 @@
 package org.group21.trainsearch.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.group21.trainsearch.camunda.workflows.TicketPaymentWorkflow;
 import org.group21.trainsearch.model.*;
@@ -12,6 +13,7 @@ import java.time.*;
 import java.util.*;
 
 @Service
+@Slf4j
 public class TrainSearchService {
 
     private final OperatorService operatorService;
@@ -21,7 +23,6 @@ public class TrainSearchService {
     private final TicketPaymentWorkflow ticketPaymentWorkflow;
     private final RestTemplate restTemplate; // You might switch to WebClient for asynchronous calls
 
-    @Autowired
     public TrainSearchService(OperatorService operatorService, TicketOrderWorkflow ticketOrderWorkflow,
                               RestTemplate restTemplate, TicketPaymentWorkflow ticketPaymentWorkflow) {
         this.operatorService = operatorService;
@@ -48,12 +49,12 @@ public class TrainSearchService {
             String url = operator.getUrl() + OperatorService.OPERATOR_JOURNEY_ENDPOINT; // no filters appended
             try {
                 Journey[] journeys = restTemplate.getForObject(url, Journey[].class);
-                for (Journey journey : journeys) {
+                for (Journey journey : Objects.requireNonNull(journeys)) {
                     journey.setOperator(operator);
                     allJourneys.add(journey);
                 }
             } catch (RestClientException e) {
-                System.err.println("Error querying operator " + operator.getUrl() + ": " + e.getMessage());
+                log.error("Error querying operator " + operator.getUrl() + ": " + e.getMessage());
                 throw e;
             }
         }

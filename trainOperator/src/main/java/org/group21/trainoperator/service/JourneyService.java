@@ -1,5 +1,6 @@
 package org.group21.trainoperator.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.group21.trainoperator.model.Journey;
 import org.group21.trainoperator.repository.JourneyRepository;
 import org.group21.trainoperator.specification.*;
@@ -14,6 +15,8 @@ import java.util.Optional;
 public class JourneyService {
 
     private final JourneyRepository journeyRepository;
+
+    private static final String ENTITY_NOT_FOUND_MESSAGE = "Journey not found";
 
     public JourneyService(JourneyRepository journeyRepository) {
         this.journeyRepository = journeyRepository;
@@ -39,6 +42,10 @@ public class JourneyService {
     }
 
     public Journey updateJourney(Long id, Journey journey) {
+        if (!journeyRepository.existsById(id)) {
+            throw new EntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE);
+        }
+        journey.setId(id);
         return journeyRepository.save(journey);
     }
 
@@ -48,7 +55,7 @@ public class JourneyService {
 
     public boolean blockSeat(Long journeyId) {
         Journey journey = journeyRepository.findById(journeyId)
-                .orElseThrow(() -> new RuntimeException("Journey not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE));
         if ((journey.getOccupiedSeats() + journey.getBlockedSeats()) < journey.getTrain().getSeats()) {
             journey.setBlockedSeats(journey.getBlockedSeats() + 1);
             journeyRepository.save(journey);
@@ -59,7 +66,7 @@ public class JourneyService {
 
     public boolean confirmSeat(Long journeyId) {
         Journey journey = journeyRepository.findById(journeyId)
-                .orElseThrow(() -> new RuntimeException("Journey not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE));
         if (journey.getBlockedSeats() > 0) {
             journey.setBlockedSeats(journey.getBlockedSeats() - 1);
             journey.setOccupiedSeats(journey.getOccupiedSeats() + 1);
@@ -71,7 +78,7 @@ public class JourneyService {
 
     public boolean cancelSeat(Long journeyId) {
         Journey journey = journeyRepository.findById(journeyId)
-                .orElseThrow(() -> new RuntimeException("Journey not found"));
+                .orElseThrow(() -> new EntityNotFoundException(ENTITY_NOT_FOUND_MESSAGE));
         if (journey.getBlockedSeats() > 0) {
             journey.setBlockedSeats(journey.getBlockedSeats() - 1);
             journeyRepository.save(journey);

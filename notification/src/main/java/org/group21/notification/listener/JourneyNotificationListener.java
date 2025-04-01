@@ -31,9 +31,9 @@ public class JourneyNotificationListener {
             String body = createNotificationEmailBody(notification);
             emailService.sendEmail(notification.getEmail(), subject, body);
         } catch (MailException e) {
-            log.error("Error processing journey notification. CAUSE: Could not send the email confirmation!");
+            log.error("Error processing journey notification. CAUSE: Could not send the email confirmation!", e);
         } catch (JsonProcessingException e) {
-            log.error("Error processing journey notification. CAUSE: Could not read the dequeued message!");
+            log.error("Error processing journey notification. CAUSE: Could not read the dequeued message!", e);
         } catch (Exception e) {
             log.error("Error processing journey notification.", e);
         }

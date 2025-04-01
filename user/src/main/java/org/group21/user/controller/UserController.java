@@ -1,6 +1,7 @@
 package org.group21.user.controller;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.group21.user.exception.UserNotFoundException;
 import org.group21.user.model.*;
@@ -65,7 +66,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable("id") Long id) {
         return userService.getUserById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                .orElseThrow(() -> new UserNotFoundException("User not found", id));
     }
 
     @GetMapping
@@ -81,12 +82,8 @@ public class UserController {
     @PutMapping("/{id}")
     @JsonView(Views.Public.class)
     public ResponseEntity<User> updateUser(@PathVariable("id") Long id, @RequestBody User user){
-        try {
-            User updated = userService.updateUser(id, user);
-            return ResponseEntity.ok(updated);
-        } catch(Exception e){
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+        User updated = userService.updateUser(id, user);
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/{id}/topup")
@@ -108,14 +105,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id){
-        try {
-            userService.deleteUserById(id);
-            log.info("User with ID {} deleted", id);
-            return ResponseEntity.noContent().build();
-        } catch(Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    public ResponseEntity<Void> deleteUser(@PathVariable("id") Long id) {
+        userService.deleteUserById(id);
+        log.info("User with ID {} deleted", id);
+        return ResponseEntity.noContent().build();
     }
 
 }

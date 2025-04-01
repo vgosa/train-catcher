@@ -8,6 +8,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.group21.exception.UnauthenticatedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -38,7 +39,7 @@ public class JwtValidationAspect {
         String token = Optional.ofNullable(request.getHeader("Authorization"))
                 .filter(header -> header.startsWith("Bearer "))
                 .map(header -> header.substring(7))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing or invalid JWT Token in the Authorization header"));
+                .orElseThrow(() -> new UnauthenticatedException("Missing or invalid JWT Token in the Authorization header"));
 
         try {
             DecodedJWT jwt = JwtUtil.verifyToken(token);
@@ -56,7 +57,7 @@ public class JwtValidationAspect {
             return joinPoint.proceed(args);
         } catch (JWTVerificationException e) {
             log.error("Invalid JWT Token", e);
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT Token");
+            throw new UnauthenticatedException("Invalid JWT Token");
         }
     }
 }

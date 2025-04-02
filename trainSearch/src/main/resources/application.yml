@@ -5,7 +5,7 @@ spring:
     import: "optional:consul:"
   cloud:
     consul:
-      host: consul
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s
@@ -20,7 +20,7 @@ spring:
     password:
     driver-class-name: org.h2.Driver
   activemq:
-    broker-url: tcp://127.0.0.1:61616
+    broker-url: ${SPRING_ACTIVEMQ_BROKER_URL:tcp://localhost:61616}
     user: admin
     password: admin
 

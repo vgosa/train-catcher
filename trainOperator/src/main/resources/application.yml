@@ -5,7 +5,7 @@ spring:
         import: "optional:consul:"
     cloud:
         consul:
-            host: consul
+            host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
             port: 8500
             discovery:
                 healthCheckInterval: 1s
@@ -31,7 +31,7 @@ spring:
     sql:
         init:
             mode: always
-            data-locations: classpath:data1.sql
+            data-locations: classpath:${TRAIN_OPERATOR_DATA:data1.sql}
 
-server:
-    port: 8090
+#server:
+#    port: 8090

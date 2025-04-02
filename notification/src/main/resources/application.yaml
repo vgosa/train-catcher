@@ -1,13 +1,13 @@
 spring:
   activemq:
-    broker-url: tcp://localhost:61616
+    broker-url: ${SPRING_ACTIVEMQ_BROKER_URL:tcp://localhost:61616}
   application:
     name: notificationService
   config:
     import: "optional:consul:"
   cloud:
     consul:
-      host: consul
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s
@@ -17,7 +17,7 @@ spring:
         preferIpAddress: true
         enabled: true
   mail:
-    host: localhost
+    host: ${SPRING_MAIL_HOST:localhost}
     port: 1025
     username: ""
     password: ""

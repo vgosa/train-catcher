@@ -5,7 +5,7 @@ spring:
     import: "optional:consul:"
   cloud:
     consul:
-      host: consul
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s
@@ -23,5 +23,5 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-server:
-  port: 8090
+#server:
+#  port: 8090

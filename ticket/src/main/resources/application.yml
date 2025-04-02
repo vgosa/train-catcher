@@ -5,7 +5,7 @@ spring:
     import: "optional:consul:"
   cloud:
     consul:
-      host: consul
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s

@@ -39,8 +39,12 @@ services:
 
   booking:
     build: ./booking
-    ports:
-      - "8070:8070"
+#    ports:
+#      - "8070:8070"
+    environment:
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
     networks:
@@ -48,11 +52,12 @@ services:
 
   notification:
     build: ./notification
-    ports:
-      - "8095:8095"
+#    ports:
+#      - "8095:8095"
     environment:
-      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
-      - SPRING_MAIL_HOST=mailhog
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
       - activemq
@@ -62,8 +67,12 @@ services:
 
   payment:
     build: ./payment
-    ports:
-      - "8072:8072"
+#    ports:
+#      - "8072:8072"
+    environment:
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
     networks:
@@ -71,8 +80,12 @@ services:
 
   ticket:
     build: ./ticket
-    ports:
-      - "8071:8071"
+#    ports:
+#      - "8071:8071"
+    environment:
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
       - activemq
@@ -84,7 +97,9 @@ services:
     ports:
       - "8089:8089"
     environment:
-      - SPRING_ACTIVEMQ_BROKER_URL=tcp://activemq:61616
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
       - activemq
@@ -93,8 +108,12 @@ services:
 
   user:
     build: ./user
-    ports:
-      - "8085:8085"
+#    ports:
+#      - "8085:8085"
+    environment:
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
     depends_on:
       - consul
     networks:
@@ -102,14 +121,18 @@ services:
 
   train-operator1:
     build: ./trainOperator
-    ports:
-      - "8090:8090"
+#    ports:
+#      - "8090:8090"
     volumes:
       - ./config/trainOperator1/application-instance.yml:/config/application-instance.yml:ro
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/config/application-instance.yml
-      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
       - SPRING_APPLICATION_NAME=trainOperator1
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - TRAIN_OPERATOR_DATA=data1.sql
+    command: ["java", "-jar", "/train-operator-service.jar", "--server.port=8090"]
     depends_on:
       - consul
     networks:
@@ -117,19 +140,22 @@ services:
 
   train-operator2:
     build: ./trainOperator
-    ports:
-      - "8091:8091"
+#    ports:
+#      - "8091:8091"
     volumes:
       - ./config/trainOperator2/application-instance.yml:/config/application-instance.yml:ro
     environment:
       - SPRING_CONFIG_ADDITIONAL_LOCATION=file:/config/application-instance.yml
-      - SPRING_CLOUD_CONSUL_HOST=consul
+      - SPRING_CLOUD_CONSUL_HOST=${SPRING_CLOUD_CONSUL_HOST}
       - SPRING_APPLICATION_NAME=trainOperator2
+      - SPRING_ACTIVEMQ_BROKER_URL=${SPRING_ACTIVEMQ_BROKER_URL}
+      - SPRING_MAIL_HOST=${SPRING_MAIL_HOST}
+      - TRAIN_OPERATOR_DATA=data2.sql
+    command: ["java", "-jar", "/train-operator-service.jar", "--server.port=8091"]
     depends_on:
       - consul
     networks:
       - soa-network
-
 networks:
   soa-network:
     driver: bridge

@@ -1,6 +1,7 @@
 package org.group21.trainsearch.camunda.activities;
 import lombok.extern.slf4j.*;
 import org.camunda.bpm.engine.delegate.*;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.group21.trainsearch.camunda.workflows.*;
 import org.group21.trainsearch.model.*;
 import org.springframework.http.*;
@@ -18,12 +19,20 @@ public class SeatBookingConfirmSeats implements JavaDelegate {
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        log.info("Entering SeatBookingConfirmSeats delegate.");
+        log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
+
+        if (Context.getJobExecutorContext().getCurrentJob().getRetries() <= 1) {
+            String errorMsg = "Failed to create ticket. No more retries left.";
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
+
         Route route = (Route) execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE);
         if (route == null || route.getJourneys() == null) {
             String errorMsg = "No route or journeys found in execution variables for confirmation.";
             log.error(errorMsg);
-            throw new BpmnError("ConfirmSeatsError", errorMsg);
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
         for (Journey journey : route.getJourneys()) {
@@ -33,7 +42,8 @@ public class SeatBookingConfirmSeats implements JavaDelegate {
             if (!response.getStatusCode().is2xxSuccessful()) {
                 String errorMsg = "Failed to confirm seat for journey id: " + journey.getId();
                 log.error(errorMsg);
-                throw new BpmnError("ConfirmSeatsError", errorMsg);
+                execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+                throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
             }
         }
         log.info("Successfully confirmed seats for all journeys.");

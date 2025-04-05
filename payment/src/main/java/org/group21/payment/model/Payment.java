@@ -38,5 +38,5 @@ public class Payment {
     private PaymentMethod paymentMethod;
 
     @Column(name = "isSuccess", nullable = false)
-    private boolean isSuccess;
+    private boolean isSuccess = true;
 }

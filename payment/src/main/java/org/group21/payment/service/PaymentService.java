@@ -1,5 +1,6 @@
 package org.group21.payment.service;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.group21.payment.model.Payment;
 import org.group21.payment.model.PaymentMethod;
 import org.group21.payment.repository.PaymentRepository;
@@ -26,4 +27,13 @@ public class PaymentService {
         return paymentRepository.save(payment);
     }
 
+    public Payment setPaymentStatus(long paymentId, boolean isSuccess) {
+        Optional<Payment> paymentOpt = paymentRepository.findById(paymentId);
+        if (paymentOpt.isPresent()) {
+            Payment payment = paymentOpt.get();
+            payment.setSuccess(isSuccess);
+            return paymentRepository.save(payment);
+        }
+        throw new EntityNotFoundException("Payment with paymentId " + paymentId + " not found");
+    }
 }

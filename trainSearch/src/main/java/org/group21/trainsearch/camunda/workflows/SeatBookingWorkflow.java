@@ -10,8 +10,13 @@ import org.group21.trainsearch.camunda.ModelBuilderHelper;
 import org.group21.trainsearch.camunda.activities.*;
 import org.springframework.stereotype.Service;
 
+/**
+ * @deprecated This class is not used directly, but is kept for reference purposes. The activities inside it
+ * are used in the TicketOrderWorkflow class.
+ */
 @Slf4j
 @Service
+@Deprecated(forRemoval = true)
 public class SeatBookingWorkflow implements ExecutionListener {
 
     public static final String SEAT_WORKFLOW_NAME = "SeatBookingWorkflow";
@@ -52,6 +57,10 @@ public class SeatBookingWorkflow implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
-        log.info("SeatBookingWorkflow execution complete: {}", execution);
+        if (execution.hasVariable(TicketOrderWorkflow.FAILURE_REASON)) {
+            log.error("SeatBookingWorkflow failed: {}", execution.getVariable(TicketOrderWorkflow.FAILURE_REASON));
+        } else {
+            log.info("SeatBookingWorkflow completed successfully.");
+        }
     }
 }

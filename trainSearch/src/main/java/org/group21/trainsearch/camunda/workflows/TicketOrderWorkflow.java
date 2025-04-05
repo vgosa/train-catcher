@@ -8,11 +8,12 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.model.bpmn.BpmnModelInstance;
 import org.group21.trainsearch.camunda.ModelBuilderHelper;
 import org.group21.trainsearch.camunda.activities.*;
-import org.group21.trainsearch.camunda.listeners.PaymentProcessListener;
 import org.group21.trainsearch.model.Route;
+import org.group21.trainsearch.model.message.Notification;
+import org.group21.trainsearch.service.WebSocketService;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Map;
 
 /**
  * This class is responsible for defining the Camunda workflow for the ticket order process.
@@ -36,10 +37,12 @@ public class TicketOrderWorkflow implements ExecutionListener {
     public static final String PAYMENT_SERVICE_URL = "http://payment/payment";
 
     private final ProcessEngine camunda;
+    private final WebSocketService wsService;
 
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
-    public TicketOrderWorkflow(ProcessEngine camunda) {
+    public TicketOrderWorkflow(ProcessEngine camunda, WebSocketService wsService) {
         this.camunda = camunda;
+        this.wsService = wsService;
     }
 
     @PostConstruct
@@ -88,14 +91,23 @@ public class TicketOrderWorkflow implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
+        Notification notification;
         if (execution.hasVariable(FAILURE_REASON)) {
             log.error("The {} job instance with ID {} failed at activity ID {}: {}", getClass().getTypeName(),
                     execution.getProcessInstanceId(),
                     execution.getCurrentActivityId(),
                     execution.getVariable(FAILURE_REASON));
+            notification = new Notification("Ticket Order Workflow Failure",
+                    "The ticket order workflow failed at activity ID " + execution.getCurrentActivityId() +
+                            ". Reason: " + execution.getVariable(FAILURE_REASON) +
+                            ". Booking ID: " + execution.getVariable(VARIABLE_BOOKING_ID) +
+                            ". Please contact support.");
+
         } else {
             log.info("The {} job was successfully executed. Booking ID: {}",
                    getClass().getTypeName(), execution.getVariable(VARIABLE_BOOKING_ID));
+            notification = new Notification("Confirmation", "Your ticket was sent to your email address!");
         }
+        wsService.sendNotification("/topic/notifications", notification);
     }
 }

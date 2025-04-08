@@ -2,10 +2,10 @@ spring:
   application:
     name: trainOperator1
   config:
-    import: "consul:"
+    import: "optional:consul:"
   cloud:
     consul:
-      host: localhost
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s
@@ -23,10 +23,5 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-server:
-  port: 8090
-
-# If you want to see detailed logs
-#logging:
-#  level:
-#    root: debug
+#server:
+#  port: 8090

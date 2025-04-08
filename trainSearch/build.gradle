@@ -18,6 +18,10 @@ repositories {
 	mavenLocal()
 }
 
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 ext {
 	set('springCloudVersion', "2022.0.3")
 }

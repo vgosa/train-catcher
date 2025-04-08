@@ -2,10 +2,10 @@ spring:
   application:
     name: user
   config:
-    import: "consul:"
+    import: "optional:consul:"
   cloud:
     consul:
-      host: localhost
+      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
       port: 8500
       discovery:
         healthCheckInterval: 1s

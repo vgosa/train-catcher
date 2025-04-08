@@ -34,7 +34,7 @@ public class OperatorRegistrationController {
                                                  @RequestParam("url") String url) {
         boolean removed = operatorService.removeOperator(name, url);
         if (removed) {
-            return ResponseEntity.ok("Operator removed successfully");
+            return ResponseEntity.noContent().build();
         } else {
             throw new EntityNotFoundException("Operator not found");
         }

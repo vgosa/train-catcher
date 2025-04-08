@@ -48,9 +48,6 @@ public class TicketCreateTicket implements JavaDelegate {
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
-        /*TODO: Would be nice to either create a common library for entities
-            or to, at a later stage, add DTOs to avoid this kind of crap.
-        */
         Ticket ticket = new Ticket(userId, bookingId, isValid);
 
         log.info("Contacting the ticket service to create a ticket.");

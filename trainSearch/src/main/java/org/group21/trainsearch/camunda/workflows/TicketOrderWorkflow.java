@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-@Service
-@Slf4j
 /**
  * This class is responsible for defining the Camunda workflow for the ticket order process.
  */
+@Service
+@Slf4j
 public class TicketOrderWorkflow implements ExecutionListener {
 
     public static final String ORDER_WORKFLOW_NAME = "TicketOrderWorkflow";
@@ -77,7 +77,8 @@ public class TicketOrderWorkflow implements ExecutionListener {
      * @param route The {@link Route} for which the ticket is being ordered
      */
     public void startTicketOrderWorkflow(long userId, Route route) {
-        camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(10);
+        camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(3);
+        camunda.getProcessEngineConfiguration().setCreateIncidentOnFailedJobEnabled(true);
 
         camunda.getRuntimeService()
                 .startProcessInstanceByKey(ORDER_WORKFLOW_NAME, Map.of(VARIABLE_ROUTE, route,
@@ -87,13 +88,14 @@ public class TicketOrderWorkflow implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
-        //TODO: This is triggered when a job is finally executed
-        log.info("Notification listener was called because a job is complete {}", execution);
-        if (execution.getCurrentActivityName().contains(DO_NOT_RETRY)) {
-            log.error("The job failed to execute");
+        if (execution.hasVariable(FAILURE_REASON)) {
+            log.error("The {} job instance with ID {} failed at activity ID {}: {}", getClass().getTypeName(),
+                    execution.getProcessInstanceId(),
+                    execution.getCurrentActivityId(),
+                    execution.getVariable(FAILURE_REASON));
         } else {
-            log.info("The job was successfully executed. Booking ID: {}",
-                    execution.getVariable(VARIABLE_BOOKING_ID));
+            log.info("The {} job was successfully executed. Booking ID: {}",
+                   getClass().getTypeName(), execution.getVariable(VARIABLE_BOOKING_ID));
         }
     }
 }

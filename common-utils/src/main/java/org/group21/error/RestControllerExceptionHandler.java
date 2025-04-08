@@ -53,6 +53,11 @@ public class RestControllerExceptionHandler extends ResponseEntityExceptionHandl
         log.debug(ERROR_MESSAGE_400, ex);
         return handleExceptionInternal(ex, ex.getMessage(), headers, HttpStatus.BAD_REQUEST, request);
     }
+    @ExceptionHandler(HttpClientErrorException.class)
+    protected ResponseEntity<Object> handleHttpClientError(final HttpClientErrorException ex, final WebRequest request) {
+        log.debug(ERROR_MESSAGE_400, ex);
+        return handleExceptionInternal(ex, ex.getMessage(), new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
 
     // 401
 

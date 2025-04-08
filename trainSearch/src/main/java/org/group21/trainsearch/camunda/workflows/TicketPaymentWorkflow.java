@@ -72,8 +72,7 @@ public class TicketPaymentWorkflow implements ExecutionListener {
     }
 
     public void startTicketPaymentWorkflow(long userId, Route route) {
-        camunda.getProcessEngineConfiguration().setCreateIncidentOnFailedJobEnabled(true);
-        camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(10);
+        camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(3);
 
         camunda.getRuntimeService()
                 .startProcessInstanceByKey(PAYMENT_WORKFLOW_NAME, Map.of(
@@ -84,11 +83,13 @@ public class TicketPaymentWorkflow implements ExecutionListener {
 
     @Override
     public void notify(DelegateExecution execution) throws Exception {
-        log.info("Notification listener was called because a job is complete {}", execution);
-        if (execution.getCurrentActivityName().contains(DO_NOT_RETRY)) {
-            log.error("The job failed to execute. Reason: {}", execution.getVariable(FAILURE_REASON));
+        if (execution.hasVariable(FAILURE_REASON)) {
+            log.error("The {} job instance with ID {} failed at activity ID {}: {}", getClass().getTypeName(),
+                    execution.getProcessInstanceId(),
+                    execution.getCurrentActivityId(),
+                    execution.getVariable(FAILURE_REASON));
         } else {
-            log.info("The job was successfully executed.");
+            log.info("The {} job was successfully executed.", getClass().getTypeName());
             execution.getProcessEngine().getRuntimeService().correlateMessage("ChildProcessCompleted");
         }
     }

@@ -23,5 +23,15 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+<<<<<<< HEAD
 #server:
 #  port: 8090
+=======
+server:
+  port: 8090
+
+# If you want to see detailed logs
+#logging:
+#  level:
+#    root: debug
+>>>>>>> main

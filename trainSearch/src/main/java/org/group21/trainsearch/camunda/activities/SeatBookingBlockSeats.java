@@ -3,6 +3,7 @@ package org.group21.trainsearch.camunda.activities;
 import com.fasterxml.jackson.databind.*;
 import lombok.extern.slf4j.*;
 import org.camunda.bpm.engine.delegate.*;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.group21.trainsearch.camunda.workflows.*;
 import org.group21.trainsearch.model.*;
 import org.springframework.http.*;
@@ -11,7 +12,7 @@ import org.springframework.web.client.*;
 
 @Slf4j
 @Component
-public class SeatBookingBlockSeats implements JavaDelegate{
+public class SeatBookingBlockSeats implements JavaDelegate {
 
     private final ObjectMapper objectMapper;
     private final RestTemplate restTemplate;
@@ -23,7 +24,14 @@ public class SeatBookingBlockSeats implements JavaDelegate{
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
-        log.info("Entering SeatBookingBlockSeats delegate.");
+        log.info(String.format("%s called with %s", getClass().getTypeName(), execution.getVariables()));
+
+        if (Context.getJobExecutorContext().getCurrentJob().getRetries() <= 1) {
+            String errorMsg = "Failed to create ticket. No more retries left.";
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
+        }
+
         Route route;
         try {
             route = objectMapper.convertValue(execution.getVariable(TicketOrderWorkflow.VARIABLE_ROUTE), Route.class);
@@ -46,7 +54,8 @@ public class SeatBookingBlockSeats implements JavaDelegate{
             if (!response.getStatusCode().is2xxSuccessful()) {
                 String errorMsg = "Failed to block seat for journey id: " + journey.getId();
                 log.error(errorMsg);
-                throw new BpmnError("BlockSeatsError", errorMsg);
+                execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
+                throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
             }
         }
         log.info("SeatBookingBlockSeats delegate completed successfully.");

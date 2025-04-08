@@ -1,11 +1,11 @@
 spring:
   application:
-    name: trainOperator2
+    name: trainOperator3
   config:
-    import: "optional:consul:"
+    import: "consul:"
   cloud:
     consul:
-      host: ${SPRING_CLOUD_CONSUL_HOST:localhost}
+      host: localhost
       port: 8500
       discovery:
         healthCheckInterval: 1s
@@ -17,21 +17,16 @@ spring:
   sql:
     init:
       mode: always
-      data-locations: classpath:data2.sql
+      data-locations: classpath:data3.sql
   datasource:
-    url: jdbc:h2:mem:trainOperator1;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:mem:trainOperator3;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     username: sa
     password:
     driver-class-name: org.h2.Driver
-<<<<<<< HEAD
-#server:
-#  port: 8091
-=======
 server:
-  port: 8091
+  port: 8092
 
 # If you want to see detailed logs
 #logging:
 #  level:
 #    root: debug
->>>>>>> main

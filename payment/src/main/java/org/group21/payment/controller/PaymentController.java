@@ -40,4 +40,11 @@ public class PaymentController {
         Optional<Payment> paymentOpt = paymentService.getPaymentById(paymentId);
         return paymentOpt.map(ResponseEntity::ok).orElseThrow(() -> new EntityNotFoundException("Payment with id " + paymentId + " not found"));
     }
+
+    @PutMapping("/status/{paymentId}")
+    public ResponseEntity<Payment> setPaymentStatus(@PathVariable("paymentId") @Min(0) Long paymentId,
+                                                    @RequestParam("isSuccess") boolean isSuccess) {
+        Payment updatedPayment = paymentService.setPaymentStatus(paymentId, isSuccess);
+        return ResponseEntity.ok(updatedPayment);
+    }
 }

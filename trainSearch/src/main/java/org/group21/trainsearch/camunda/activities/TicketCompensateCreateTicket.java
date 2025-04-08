@@ -35,12 +35,12 @@ public class TicketCompensateCreateTicket implements JavaDelegate {
         try {
             restTemplate.delete("http://ticket/ticket/" + ticketId);
         } catch (Exception e) {
-            log.error("Failed to compensate ticket creation. CAUSE: Could not contact the ticket service to delete the ticket.", e);
+            String errorMessage = "Failed to compensate ticket creation. CAUSE: Could not contact the ticket service to delete the ticket.";
+            log.error(errorMessage, e);
+            execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMessage);
             return;
         }
 
         log.info("Successfully compensated ticket creation for ticketId: {}", ticketId);
-
-        bookingCompensateCreateBooking.execute(execution);
     }
 }

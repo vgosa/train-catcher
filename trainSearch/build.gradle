@@ -18,6 +18,10 @@ repositories {
 	mavenLocal()
 }
 
+bootJar {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
 ext {
 	set('springCloudVersion', "2022.0.3")
 }
@@ -29,6 +33,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
 	implementation 'org.group21:common-utils:1.0.2'
 	implementation 'org.json:json:20240303'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'

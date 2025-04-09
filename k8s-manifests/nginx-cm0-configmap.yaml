@@ -1,0 +1,57 @@
+apiVersion: v1
+data:
+  nginx.conf: |
+    user  nginx;
+    worker_processes  auto;
+
+    error_log  /var/log/nginx/error.log warn;
+    pid        /var/run/nginx.pid;
+
+    events {
+        worker_connections 1024;
+    }
+
+    http {
+        include       /etc/nginx/mime.types;
+        default_type  application/octet-stream;
+
+        upstream trainSearch {
+            zone upstream-trainSearch 64k;
+            least_conn;
+            # Static fallback server for local development
+            server 127.0.0.1:65535; # forces a 502 if no trainSearch is available
+        }
+
+        server {
+            listen       80 default_server;
+            listen       [::]:80 default_server;
+
+            location / {
+                root   /usr/share/nginx/html;
+                index  index.html;
+            }
+
+            location /stub_status {
+                stub_status;
+            }
+
+            # Expose trainSearch via the API gateway
+            location /trainSearch {
+                proxy_pass http://trainSearch;
+                rewrite ^/trainSearch/(.*)$ /$1 break;
+            }
+
+            # Expose Mailhog interface on /mailhog
+            location /mailhog {
+                proxy_pass http://mailhog:8025;
+                rewrite ^/mailhog/(.*)$ /$1 break;
+            }
+        }
+    }
+kind: ConfigMap
+metadata:
+  annotations:
+    use-subpath: "true"
+  labels:
+    io.kompose.service: nginx
+  name: nginx-cm0

@@ -50,6 +50,10 @@ public class TrainSearchService {
         List<Journey> allJourneys = new ArrayList<>();
 
         for (Operator operator : operatorService.getOperators()) {
+            if (!operator.isActive()) {
+                log.info("Operator {} is inactive, skipping...", operator.getName());
+                continue;
+            }
             String url = operator.getUrl() + OperatorService.OPERATOR_JOURNEY_ENDPOINT; // no filters appended
             try {
                 Journey[] journeys = restTemplate.getForObject(url, Journey[].class);

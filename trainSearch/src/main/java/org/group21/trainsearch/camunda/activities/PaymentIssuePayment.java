@@ -92,14 +92,8 @@ public class PaymentIssuePayment implements JavaDelegate {
         runtimeService.startProcessInstanceByKey(TicketPaymentWorkflow.PAYMENT_WORKFLOW_NAME, Map.of(
                 TicketPaymentWorkflow.VARIABLE_USER_ID, userId,
                 TicketPaymentWorkflow.VARIABLE_ROUTE, route,
-                "parentProcessInstanceId", execution.getProcessInstanceId()
+                "businessKey", execution.getBusinessKey()
         ));
         execution.setVariable("childProcessStarted", true);
-
-        log.info("About to send PaymentOutcomeSignal to seat booking workflow.");
-        Map<String, Object> signalVariables = new HashMap<>();
-        signalVariables.put(SeatBookingWorkflow.PAYMENT_SUCCESS_VARIABLE, true); // or false on failure
-        runtimeService.signalEventReceived("PaymentOutcomeSignal", signalVariables);
-        log.info("PaymentOutcomeSignal sent with variables: {}", signalVariables);
     }
 }

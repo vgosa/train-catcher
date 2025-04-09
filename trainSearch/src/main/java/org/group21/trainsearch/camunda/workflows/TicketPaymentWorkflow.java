@@ -19,6 +19,7 @@ import org.group21.trainsearch.model.Route;
 import org.springframework.stereotype.Service;
 
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -88,9 +89,26 @@ public class TicketPaymentWorkflow implements ExecutionListener {
                     execution.getProcessInstanceId(),
                     execution.getCurrentActivityId(),
                     execution.getVariable(FAILURE_REASON));
+            execution.getProcessEngine().getRuntimeService().correlateMessage(
+                    "ChildProcessCompleted",
+                    (String) execution.getVariable("businessKey"),
+                    Map.of(FAILURE_REASON, execution.getVariable(FAILURE_REASON))
+            );
+            log.info("About to send PaymentOutcomeSignal to seat booking workflow.");
+            Map<String, Object> signalVariables = new HashMap<>();
+            signalVariables.put(SeatBookingWorkflow.PAYMENT_SUCCESS_VARIABLE, false); // or false on failure
+            execution.getProcessEngine().getRuntimeService().signalEventReceived("PaymentOutcomeSignal", signalVariables);
+            log.info("PaymentOutcomeSignal sent with variables: {}", signalVariables);
         } else {
             log.info("The {} job was successfully executed.", getClass().getTypeName());
-            execution.getProcessEngine().getRuntimeService().correlateMessage("ChildProcessCompleted");
+            execution.getProcessEngine().getRuntimeService().correlateMessage(
+                    "ChildProcessCompleted",
+                    (String) execution.getVariable("businessKey")
+            );
+            Map<String, Object> signalVariables = new HashMap<>();
+            signalVariables.put(SeatBookingWorkflow.PAYMENT_SUCCESS_VARIABLE, false); // or false on failure
+            execution.getProcessEngine().getRuntimeService().signalEventReceived("PaymentOutcomeSignal", signalVariables);
+            log.info("PaymentOutcomeSignal sent with variables: {}", signalVariables);
         }
     }
 

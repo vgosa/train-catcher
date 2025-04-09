@@ -14,6 +14,7 @@ import org.group21.trainsearch.service.WebSocketService;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * This class is responsible for defining the Camunda workflow for the ticket order process.
@@ -62,6 +63,7 @@ public class TicketOrderWorkflow implements ExecutionListener {
                 .activity("Issue payment", PaymentIssuePayment.class)
                 .compensationActivity("Compensate payment", PaymentCompensateIssuePayment.class)
                 .receiveTask("Wait for payment", "ChildProcessCompleted")
+                .activity("Check payment status", PaymentCheckPaymentStatus.class)
                 .activity("Confirm booked seats", SeatBookingConfirmSeats.class)
                 .activity("Send ticket via email", EmailSendTicket.class)
                 .endSuccess()
@@ -82,11 +84,14 @@ public class TicketOrderWorkflow implements ExecutionListener {
     public void startTicketOrderWorkflow(long userId, Route route) {
         camunda.getProcessEngineConfiguration().setDefaultNumberOfRetries(3);
         camunda.getProcessEngineConfiguration().setCreateIncidentOnFailedJobEnabled(true);
+        UUID businessKey = UUID.randomUUID();
 
         camunda.getRuntimeService()
-                .startProcessInstanceByKey(ORDER_WORKFLOW_NAME, Map.of(VARIABLE_ROUTE, route,
-                        VARIABLE_USER_ID, userId,
-                        VARIABLE_PAYMENT_METHOD, "DEBIT"));
+                .startProcessInstanceByKey(ORDER_WORKFLOW_NAME,
+                        businessKey.toString(),
+                            Map.of(VARIABLE_ROUTE, route,
+                            VARIABLE_USER_ID, userId,
+                            VARIABLE_PAYMENT_METHOD, "DEBIT"));
     }
 
     @Override
@@ -102,7 +107,6 @@ public class TicketOrderWorkflow implements ExecutionListener {
                             ". Reason: " + execution.getVariable(FAILURE_REASON) +
                             ". Booking ID: " + execution.getVariable(VARIABLE_BOOKING_ID) +
                             ". Please contact support.");
-
         } else {
             log.info("The {} job was successfully executed. Booking ID: {}",
                    getClass().getTypeName(), execution.getVariable(VARIABLE_BOOKING_ID));

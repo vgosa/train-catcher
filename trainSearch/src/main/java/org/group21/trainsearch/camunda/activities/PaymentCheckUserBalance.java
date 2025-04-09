@@ -79,8 +79,11 @@ public class PaymentCheckUserBalance implements JavaDelegate {
         }
 
         if (user.getBalance() < route.getTotalPrice()) {
-            log.error("User does not have sufficient balance to pay for the ticket");
+            String errorMsg = "User does not have sufficient balance to pay for the ticket";
+            log.error(errorMsg);
             execution.setVariable(TicketPaymentWorkflow.VARIABLE_SUFFICIENT_BALANCE, false);
+            execution.setVariable(TicketPaymentWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketPaymentWorkflow.DO_NOT_RETRY, errorMsg);
         } else {
             log.info("User has sufficient balance to pay for the ticket");
             execution.setVariable(TicketPaymentWorkflow.VARIABLE_SUFFICIENT_BALANCE, true);

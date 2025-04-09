@@ -60,11 +60,10 @@ public class TicketPaymentWorkflow implements ExecutionListener {
                 .moveToLastGateway()
                 .conditionExpression("Yes", String.format("${execution.getVariable('%s')}", VARIABLE_SUFFICIENT_BALANCE))
                 .activity("Process payment", PaymentProcessPayment.class)
+                .compensationActivity("Compensate payment processing", PaymentCompensateProcessPayment.class)
                 .endSuccess()
                 .addListener(ExecutionListener.EVENTNAME_START, this.getClass())
                 .triggerCompensationOnErrorWithoutEnd(DO_NOT_RETRY)
-                .activity("Compensate payment processing", PaymentCompensateProcessPayment.class)
-                .end("Compensation")
                 .addListener(ExecutionListener.EVENTNAME_END, this.getClass())
                 .build();
         camunda.getRepositoryService().createDeployment()

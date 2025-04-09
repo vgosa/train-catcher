@@ -16,6 +16,7 @@ public class JacksonConfig {
     public ObjectMapper objectMapper() {
         return new ObjectMapper()
                 .registerModule(new JavaTimeModule())
-                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"));
+                .setDateFormat(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"))
+                .configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
 }

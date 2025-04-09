@@ -188,6 +188,7 @@
                 var message = JSON.parse(notification.body);
                 alert(message.title + "\n" +
                     message.message);
+                loadUserInfo();
             });
         })
     }

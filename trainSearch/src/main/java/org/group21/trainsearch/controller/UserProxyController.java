@@ -37,7 +37,7 @@ public class UserProxyController {
 
     @PostMapping("/{id}/topup")
     @RequiresAuthentication
-    public ResponseEntity<?> topUpUser(
+    public ResponseEntity<User> topUpUser(
             @PathVariable Integer id,
             @RequestBody Double amount,
             @RequestHeader(name = "Authorization", required = false) String authHeader,
@@ -53,8 +53,8 @@ public class UserProxyController {
         headers.set("Authorization", authHeader);
         HttpEntity<Double> request = new HttpEntity<>(amount, headers);
 
-        ResponseEntity<Double> response = restTemplate.exchange(
-                url, HttpMethod.POST, request, Double.class
+        ResponseEntity<User> response = restTemplate.exchange(
+                url, HttpMethod.POST, request, User.class
         );
         return ResponseEntity.ok(response.getBody());
     }

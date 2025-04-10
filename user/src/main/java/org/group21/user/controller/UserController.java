@@ -87,21 +87,23 @@ public class UserController {
     }
 
     @PostMapping("/{id}/topup")
-    public ResponseEntity<Double> topUpUser(
+    @JsonView(Views.Public.class)
+    public ResponseEntity<User> topUpUser(
             @PathVariable Long id,
             @RequestBody Double amount) {
 
         User updated = userService.topUpBalance(id, amount);
-        return ResponseEntity.ok(updated.getBalance());
+        return ResponseEntity.ok(updated);
     }
 
     @PostMapping("/{id}/deduct")
-    public ResponseEntity<Double> deductUser(
+    @JsonView(Views.Public.class)
+    public ResponseEntity<User> deductUser(
             @PathVariable Long id,
             @RequestBody Double amount) {
 
         User updated = userService.deductBalance(id, amount);
-        return ResponseEntity.ok(updated.getBalance());
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")

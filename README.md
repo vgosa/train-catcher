@@ -103,7 +103,16 @@ export SPRING_MAIL_HOST=mailhog
 export SPRING_ACTIVEMQ_BROKER_URL="tcp://activemq:61616"
 ```
 
-### 3. Build Docker Images
+### 3. Build JAR files
+
+Build the jar files for all the services via the dedicated script:
+
+```bash
+chmod +x build-all.sh
+./build-all.sh
+```
+
+### 4. Build Docker Images
 
 Build the Docker images for all the services:
 
@@ -117,7 +126,7 @@ docker build -t user ./user
 docker build -t train-operator ./trainOperator
 ```
 
-### 4. Deploy Kubernetes Manifests
+### 5. Deploy Kubernetes Manifests
 
 Deploy the application manifests to your Minikube Kubernetes cluster:
 
@@ -125,7 +134,7 @@ Deploy the application manifests to your Minikube Kubernetes cluster:
 kubectl apply -f ./k8s-manifests
 ```
 
-### 5. Finding Service URLs
+### 6. Finding Service URLs
 
 After deploying, you can easily find the URLs for the relevant services using the following commands:
 

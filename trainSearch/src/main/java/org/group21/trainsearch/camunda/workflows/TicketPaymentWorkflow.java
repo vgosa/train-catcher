@@ -35,6 +35,7 @@ public class TicketPaymentWorkflow implements ExecutionListener {
     public static final String VARIABLE_SUFFICIENT_BALANCE = "userHasSufficientBalance";
     public static final String VARIABLE_ROUTE = "route";
     public static final String VARIABLE_USER_ID = "userId";
+    public static final String VARIABLE_USER = "user";
     public static final String USER_SERVICE_URL = "http://user/user";
     public static final String OPERATOR_CONTEXT_PATH = "/operator";
     private final ProcessEngine camunda;
@@ -102,7 +103,8 @@ public class TicketPaymentWorkflow implements ExecutionListener {
             log.info("The {} job was successfully executed.", getClass().getTypeName());
             execution.getProcessEngine().getRuntimeService().correlateMessage(
                     "ChildProcessCompleted",
-                    (String) execution.getVariable("businessKey")
+                    (String) execution.getVariable("businessKey"),
+                    Map.of(TicketPaymentWorkflow.VARIABLE_USER, execution.getVariable(TicketPaymentWorkflow.VARIABLE_USER))
             );
             Map<String, Object> signalVariables = new HashMap<>();
             signalVariables.put(SeatBookingWorkflow.PAYMENT_SUCCESS_VARIABLE, false); // or false on failure

@@ -129,7 +129,7 @@
         });
         if (!resp.ok) throw new Error(await resp.text());
         const newBalance = await resp.json();
-        alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(newBalance)}`);
+        alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(newBalance.balance)}`);
         document.getElementById("topUpAmount").value = '';
         bootstrap.Modal.getInstance(document.getElementById('topUpModal')).hide();
         loadUserInfo();

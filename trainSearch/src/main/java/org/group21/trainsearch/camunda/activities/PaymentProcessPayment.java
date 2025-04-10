@@ -10,6 +10,7 @@ import org.group21.trainsearch.camunda.workflows.TicketPaymentWorkflow;
 import org.group21.trainsearch.model.Journey;
 import org.group21.trainsearch.model.Operator;
 import org.group21.trainsearch.model.Route;
+import org.group21.trainsearch.model.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -71,8 +72,8 @@ public class PaymentProcessPayment implements JavaDelegate {
             throw new BpmnError(TicketPaymentWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
-        ResponseEntity<Double> userResponse = restTemplate.postForEntity(String.format("%s/%s/deduct",
-                TicketPaymentWorkflow.USER_SERVICE_URL, userId), route.getTotalPrice(), Double.class);
+        ResponseEntity<User> userResponse = restTemplate.postForEntity(String.format("%s/%s/deduct",
+                TicketPaymentWorkflow.USER_SERVICE_URL, userId), route.getTotalPrice(), User.class);
 
         if (userResponse.getStatusCode().isError()) {
             String errorMsg = "Failed to deduct payment from user";
@@ -80,6 +81,15 @@ public class PaymentProcessPayment implements JavaDelegate {
             execution.setVariable(TicketPaymentWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketPaymentWorkflow.DO_NOT_RETRY, errorMsg);
         }
+
+        if (userResponse.getBody() == null) {
+            String errorMsg = "Could not retrieve user from response";
+            log.error(errorMsg);
+            execution.setVariable(TicketPaymentWorkflow.FAILURE_REASON, errorMsg);
+            throw new BpmnError(TicketPaymentWorkflow.DO_NOT_RETRY, errorMsg);
+        }
+
+        execution.setVariable(TicketPaymentWorkflow.VARIABLE_USER, userResponse.getBody());
 
         ticketPaymentWorkflow.setWasUserCredited(true);
 

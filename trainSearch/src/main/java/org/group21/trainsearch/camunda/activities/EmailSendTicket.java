@@ -9,6 +9,7 @@ import org.group21.trainsearch.camunda.workflows.TicketOrderWorkflow;
 import org.group21.trainsearch.config.JMSProducer;
 import org.group21.trainsearch.model.Route;
 import org.group21.trainsearch.model.Ticket;
+import org.group21.trainsearch.model.User;
 import org.json.JSONObject;
 import org.springframework.stereotype.Component;
 
@@ -33,26 +34,28 @@ public class EmailSendTicket implements JavaDelegate {
 
         Ticket ticket;
         Route route;
+        User user;
         try {
-            ticket = (Ticket) execution.getVariableTyped("ticket").getValue();
-            route = (Route) execution.getVariableTyped("route").getValue();
+            ticket = (Ticket) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_TICKET).getValue();
+            route = (Route) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_ROUTE).getValue();
+            user = (User) execution.getVariableTyped(TicketOrderWorkflow.VARIABLE_USER).getValue();
         } catch (IllegalArgumentException e) {
-            String errorMsg = "Failed to convert ticket or route from execution variables";
+            String errorMsg = "Failed to convert ticket, route or user from execution variables";
             log.error(errorMsg, e);
             execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
-        if (ticket == null || route == null) {
-            String errorMsg = "Ticket or route is null";
+        if (ticket == null || route == null || user == null) {
+            String errorMsg = "Ticket, route or user is null";
             log.error(errorMsg);
             execution.setVariable(TicketOrderWorkflow.FAILURE_REASON, errorMsg);
             throw new BpmnError(TicketOrderWorkflow.DO_NOT_RETRY, errorMsg);
         }
 
         JSONObject ticketJson = new JSONObject()
-                .put("passenger", "Vlad Gosa") //TODO: ticket.getPassenger()
-                .put("email", "v.gosa@student.utwente.nl") //TODO: ticket.getEmail()
+                .put("passenger", user.getFirstName() + " " + user.getLastName())
+                .put("email", user.getEmail())
                 .put("journeys", route.getJourneys())
                 .put("totalPrice", route.getTotalPrice())
                 .put("totalDuration", route.getTotalDuration());

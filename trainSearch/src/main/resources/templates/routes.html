@@ -137,7 +137,7 @@
         alert(`Balance updated: ${new Intl.NumberFormat('nl-NL', {
             style: 'currency',
             currency: 'EUR'
-        }).format(newBalance)}`);
+        }).format(newBalance.balance)}`);
         document.getElementById("topUpAmount").value = '';
         bootstrap.Modal.getInstance(document.getElementById('topUpModal')).hide();
         loadUserInfo();

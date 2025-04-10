@@ -25,7 +25,7 @@ spec:
             - agent
             - -dev
             - -client=0.0.0.0
-          image: hashicorp/consul:latest
+          image: hashicorp/consul:1.20
           name: consul
           ports:
             - containerPort: 8500

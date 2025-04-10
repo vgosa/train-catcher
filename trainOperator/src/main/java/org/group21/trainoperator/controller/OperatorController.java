@@ -27,12 +27,8 @@ public class OperatorController {
     @PutMapping("/{operatorId}")
     public ResponseEntity<Operator> updateOperator(@RequestBody Operator operator,
                                                    @PathVariable("operatorId") Long operatorId) {
-        try {
-            Operator updatedOperator = operatorService.updateOperator(operatorId, operator);
-            return ResponseEntity.ok(updatedOperator);
-        } catch (OperatorNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Operator updatedOperator = operatorService.updateOperator(operatorId, operator);
+        return ResponseEntity.ok(updatedOperator);
     }
 
     @PostMapping("/{operatorName}/topup")
@@ -40,7 +36,7 @@ public class OperatorController {
                                                  @RequestBody Double amount) {
         return operatorService.topUpBalance(operatorName, amount)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new OperatorNotFoundException("Operator not found", operatorName));
     }
 
 
@@ -49,6 +45,6 @@ public class OperatorController {
                                                   @RequestBody Double amount) {
         return operatorService.deductBalance(operatorName, amount)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new OperatorNotFoundException("Operator not found", operatorName));
     }
 }

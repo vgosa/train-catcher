@@ -21,11 +21,8 @@ public class TrainSearchController {
 
     private final TrainSearchService trainSearchService;
 
-    private final RestTemplate restTemplate;
-
     public TrainSearchController(TrainSearchService trainSearchService, RestTemplate restTemplate) {
         this.trainSearchService = trainSearchService;
-        this.restTemplate = restTemplate;
     }
 
     @GetMapping("/routes")

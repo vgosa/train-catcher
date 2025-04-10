@@ -10,25 +10,25 @@ info:
     email: v.gosa@student.utwente.nl
     name: Vlad Gosa or Victor Alecu
 tags:
-  - name: train
-    description: Train data of a train operator
-  - name: journey
-    description: Journeys offered by a train operator (from station A to station B with train XYZ)
-  - name: search
-    description: Searching is a business process involving the search and aggregation of train journeys (into routes).Routes are a collection of journeys that start from the first journey's destination, and end with the last journey's arrival station
+  - name: views
+    description: Endpoints that return a viewable HTML page
+  - name: trainOperator
+    description: Service that handles Operators, Trains and Journeys
+  - name: trainSearch
+    description: Service that handles the aggregation of journeys, operators and trains into routes
   - name: booking
-    description: Bookings represent a reference to a business process that books seats on a given route for a user
+    description: Service that handles Bookings. Bookings represent a reference to a business process that books seats on a given route for a user
   - name: ticket
-    description: Tickets represent a confirmation of the purchase of a booking made by a user
+    description: Service that handles tickets. Tickets represent a confirmation of the purchase of a booking made by a user
   - name: payment
-    description: Payments represent the trigger of a payment process
+    description: Service that handles payments. Payments represent the trigger of a payment process
   - name: user
-    description: Accounts of users using the platform
+    description: Service that handles user accounts and authentication.
 paths:
   /train:
     get:
       tags:
-        - train
+        - trainOperator
       summary: Get all trains from a train company
       description: This endpoint retrieves multiple train objects from a single train company.
       operationId: getTrains
@@ -43,7 +43,7 @@ paths:
                   $ref: '#/components/schemas/Train'
     post:
       tags:
-        - train
+        - trainOperator
       summary: Add a new train to the train company
       description: Add a new train to the train company. The ID of the entity will be assigned monotonically increasing relative to the last existing entry, regardless of the input value.
       operationId: addTrain
@@ -68,7 +68,7 @@ paths:
   /train/{trainId}:
     get:
       tags:
-        - train
+        - trainOperator
       summary: Get a single train entity from the train company by trainId
       description: Get a single train entity from the train company by trainId
       operationId: getTrainById
@@ -94,7 +94,7 @@ paths:
           description: Train not found
     put:
       tags:
-        - train
+        - trainOperator
       summary: Update a train entity from the train company
       description: Update a train entity from the train company
       operationId: updateTrain
@@ -127,7 +127,7 @@ paths:
           description: Validation exception
     delete:
       tags:
-        - train
+        - trainOperator
       summary: Delete a train entity from the train company
       description: Delete a train entity from the train company
       operationId: deleteTrain
@@ -148,7 +148,7 @@ paths:
   /journey:
     get:
       tags:
-        - journey
+        - trainOperator
       summary: Find journeys from the train company
       description: Find one or more journeys from the train company based on departure and arrival stations, time of departure and delay status
       operationId: findJourneys
@@ -193,7 +193,7 @@ paths:
                   $ref: '#/components/schemas/Journey'
     post:
       tags:
-        - journey
+        - trainOperator
       summary: Add a new journey to the train company
       description: Add a new journey to the train company. The ID of the entity will be assigned monotonically increasing relative to the last existing entry, regardless of the input value.
       operationId: addJourney
@@ -218,7 +218,7 @@ paths:
   /journey/{journeyId}:
     get:
       tags:
-        - journey
+        - trainOperator
       summary: Get a single journey entity from the train company by journeyId
       description: Get a single journey entity from the train company by journeyId
       operationId: getJourneyById
@@ -244,7 +244,7 @@ paths:
           description: Journey not found
     put:
       tags:
-        - journey
+        - trainOperator
       summary: Update a journey entity from the train company
       description: Update a journey entity from the train company
       operationId: updateJourney
@@ -277,7 +277,7 @@ paths:
           description: Validation exception
     delete:
       tags:
-        - journey
+        - trainOperator
       summary: Delete a journey entity from the train company
       description: Delete a journey entity from the train company
       operationId: deleteJourney
@@ -295,10 +295,303 @@ paths:
           description: Successful operation
         '400':
           description: Invalid input
+  /journey/{journeyId}/block:
+    post:
+      tags:
+        - trainOperator
+      summary: Block a seat for a journey when a booking is made
+      description: Block a seat for a journey when a booking is made
+      operationId: blockSeat
+      parameters:
+        - name: journeyId
+          example: 10
+          in: path
+          description: ID of journey that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: Journey not found
+        '409':
+          description: Could not block seat because of the current state of the journey
+  /journey/{journeyId}/confirm:
+    post:
+      tags:
+        - trainOperator
+      summary: Confirm a seat for a journey when a booking is made and the user has paid for the ticket
+      description: Confirm a seat for a journey when a booking is made and the user has paid for the ticket
+      operationId: confirmSeat
+      parameters:
+        - name: journeyId
+          example: 10
+          in: path
+          description: ID of journey that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: Journey not found
+        '409':
+          description: Could not confirm seat because of the current state of the journey
+  /journey/{journeyId}/cancel:
+    post:
+      tags:
+        - trainOperator
+      summary: Cancel a seat for a journey if the user has not paid for the ticket
+      description: Cancel a seat for a journey if the user has not paid for the ticket
+      operationId: cancelSeat
+      parameters:
+        - name: journeyId
+          example: 10
+          in: path
+          description: ID of journey that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: Journey not found
+        '409':
+          description: Could not cancel the seat reservation because of the current state of the journey
+  /operator:
+    get:
+      tags:
+        - trainOperator
+      summary: Get all Operators
+      description: Retrieve a list of all operators.
+      operationId: getAllOperators
+      responses:
+        '200':
+          description: Successful operation, returns a list of operators.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+  /operator/{operatorId}:
+    put:
+      tags:
+        - trainOperator
+      summary: Update an operator entity
+      description: Update an operator entity
+      operationId: updateOperator
+      parameters:
+        - name: operatorId
+          in: path
+          example: 10
+          description: ID of operator that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Update an existent
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Operator'
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+        '400':
+          description: Invalid input
+        '422':
+          description: Validation exception
+  /operator/{operatorName}/topup:
+    post:
+      tags:
+        - trainOperator
+      summary: Top up the balance of an operator
+      description: Top up the balance of an operator
+      operationId: topUpBalance
+      parameters:
+        - name: operatorName
+          in: path
+          description: Name of the operator that needs to be updated
+          required: true
+          schema:
+            type: string
+            example: NS
+      requestBody:
+        description: Amount to top up the balance of the operator
+        content:
+          text/plain:
+            schema:
+              type: number
+              example: 1000
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: Operator not found
+  /operator/{operatorName}/deduct:
+    post:
+      tags:
+        - trainOperator
+      summary: Deduct the balance of an operator
+      description: Deduct the balance of an operator
+      operationId: deductBalance
+      parameters:
+        - name: operatorName
+          in: path
+          description: Name of the operator that needs to be updated
+          required: true
+          schema:
+            type: string
+            example: NS
+      requestBody:
+        description: Amount to deduct from the balance of the operator
+        content:
+          text/plain:
+            schema:
+              type: number
+              example: 1000
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '404':
+          description: Operator not found
+  /:
+    get:
+      tags:
+        - trainSearch
+        - views
+      summary: Login page
+      description: This endpoint returns the login page
+      operationId: loginPage
+      responses:
+        '200':
+          description: Page returned successfully
+  /search:
+    get:
+      tags:
+        - trainSearch
+        - views
+      summary: Search page for train routes
+      description: This endpoint returns the search page for train routes
+      operationId: searchPage
+      responses:
+        '200':
+          description: Page returned successfully
+  /signup:
+    get:
+      tags:
+        - trainSearch
+        - views
+      summary: Signup page
+      description: This endpoint returns the signup page
+      operationId: signupPage
+      responses:
+        '200':
+          description: Page returned successfully
+  /routes:
+    get:
+      tags:
+        - trainSearch
+        - views
+      summary: Routes page with search results
+      description: This endpoint returns the routes page with search results
+      operationId: routesPage
+      responses:
+        '200':
+          description: Page returned successfully
+  /operators:
+    get:
+      tags:
+        - trainSearch
+      summary: Return a list of all registered operators
+      description: Return a list of all registered operators
+      operationId: getRegisteredOperators
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Operator'
+  /operators/register:
+    post:
+      tags:
+        - trainSearch
+      summary: Register a new operator in the train search system
+      description: Register a new operator in the train search system
+      operationId: registerOperator
+      requestBody:
+          description: Operator entity to register
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+          required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
+        '400':
+          description: Invalid input
+  /operators/remove:
+    delete:
+      tags:
+        - trainSearch
+      summary: Remove an operator from the train search system
+      description: Remove an operator from the train search system
+      operationId: removeOperator
+      parameters:
+        - name: name
+          in: query
+          description: Name of the operator to be removed
+          required: true
+          schema:
+            type: string
+            example: NS
+        - name: url
+          in: query
+          description: URL of the operator to be removed
+          required: true
+          schema:
+            type: string
+            example: http://ns.nl
+      responses:
+        '204':
+          description: Successful operation
+        '404':
+          description: Operator not found
   /search/routes:
     get:
       tags:
-        - search
+        - trainSearch
       summary: Get a list of routes composed of an array of journeys gathered from all train companies
       description: Get a list of routes composed of an array of journeys gathered from all train companies, between the given departure and arrival stations, starting from the departure time
       operationId: findRoutes
@@ -325,13 +618,14 @@ paths:
             type: string
             format: date-time
             example: 2025-03-05T11:59:19.845Z
-        - name: fetchDelayed
+        - name: max_changes
           in: query
-          description: Whether to fetch delayed journeys in the routes or not
+          description: Maximum amount of train changes allowed in the route
           required: false
           schema:
-            type: boolean
-            default: false
+            type: integer
+            default: 2
+            minimum: 0
       responses:
         '200':
           description: Successful operation
@@ -340,7 +634,43 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Journey'
+                  $ref: '#/components/schemas/Route'
+        '400':
+          description: Invalid input
+  /search/order:
+    post:
+      tags:
+        - trainSearch
+      security:
+        - bearerAuth: []
+      summary: Order a ticket for a given route
+      description: Order a ticket for a given route
+      operationId: orderTicket
+      parameters:
+        - name: userId
+          in: query
+          description: User ID which requests the ticket
+          required: true
+          schema:
+              type: integer
+              format: int32
+              example: 10
+              minimum: 0
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Route'
+      responses:
+        '200':
+          description: Request sent successfully (The orchestration engine has been notified)
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - no JWT token was found inside the request Authorization header
+        '403':
+          description: Forbidden - the JWT token was found but it is invalid or does not match the requesting user id
   /booking:
     post:
       tags:
@@ -357,14 +687,13 @@ paths:
             type: integer
             format: int32
             example: 10
+            minimum: 0
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: array
-              items:
-                $ref: '#/components/schemas/Journey'
+              $ref: '#/components/schemas/Route'
       responses:
         '201':
             description: successful operation
@@ -394,6 +723,7 @@ paths:
             type: integer
             format: int32
             example: 10
+            minimum: 0
       responses:
         '200':
             description: successful operation
@@ -420,6 +750,7 @@ paths:
           schema:
             type: integer
             format: int64
+            minimum: 0
       requestBody:
         description: Update a booking entity
         content:
@@ -462,26 +793,9 @@ paths:
    post:
       tags:
         - ticket
-      summary: Create a ticket for a given userId and bookingId
-      description: Create a ticket for a given userId and bookingId
+      summary: Create a ticket
+      description: Create a ticket
       operationId: createTicket
-      parameters:
-        - name: userId
-          in: query
-          description: userId to which the booking is linked
-          required: true
-          schema:
-            type: integer
-            format: int32
-            example: 10
-        - name: bookingId
-          in: query
-          description: bookingId to which the booking is linked
-          required: true
-          schema:
-            type: integer
-            format: int32
-            example: 10
       requestBody:
         required: true
         content:
@@ -597,6 +911,7 @@ paths:
             type: integer
             format: int64
             example: 10
+            minimum: 0
       responses:
         '200':
             description: successful operation
@@ -623,6 +938,13 @@ paths:
           schema:
             type: string
             enum: [debit, ideal]
+        - name: userId
+          in: query
+          description: User ID which requests the payment
+          required: true
+          schema:
+            type: integer
+            format: int64
         - name: bookingId
           in: query
           description: Booking ID for which to pay
@@ -638,7 +960,7 @@ paths:
                 schema:
                   $ref: '#/components/schemas/Payment'
         '400':
-          description: Invalid input or payment did not succeed
+          description: Invalid input
   /user:
     get:
       tags:
@@ -654,14 +976,15 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  $ref: '#/components/schemas/UserPublic'
         '404':
           description: No users found
     post:
       tags:
         - user
+        - trainSearch
       summary: Create user
-      description: This can only be done by the logged in user.
+      description: Create a user on signup. The endpoint resides on the user service, but trainSearch proxies the same endpoint to the user service for authentication
       operationId: createUser
       requestBody:
         description: Created user object
@@ -678,7 +1001,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPublic'
   /user/createWithList:
     post:
       tags:
@@ -699,15 +1022,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPublic'
         default:
           description: successful operation
   /user/login:
     post:
       tags:
         - user
+        - trainSearch
       summary: Logs user into the system
-      description: ''
+      description: The endpoint resides on the user service, but trainSearch proxies the same endpoint to the user service for authentication
       operationId: loginUser
       requestBody:
         description: User credentials for login
@@ -715,36 +1039,20 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: The email for login
-                password:
-                  type: string
-                  description: The password for login in clear text
+              $ref: '#/components/schemas/LoginRequest'
       responses:
         '200':
-          description: Successful operation. Returns the user id.
-          headers:
-            X-Rate-Limit:
-              description: Calls per hour allowed by the user
-              schema:
-                type: integer
-                format: int32
-            X-Expires-After:
-              description: Date in UTC when token expires
-              schema:
-                type: string
-                format: date-time
+          description: Successful operation. Returns the user id and generated token.
           content:
             application/json:
               schema:
-                type: string
-                description: The id of the user as a string.
-                example: "123"
+                $ref: '#/components/schemas/LoginResponse'
         '400':
-          description: Invalid email/password supplied
+          description: Invalid email/password supplied (formatting error)
+        '401':
+          description: Invalid email/password supplied (authentication error)
+        '404':
+          description: User not found
   /user/logout:
     post:
       tags:
@@ -760,19 +1068,23 @@ paths:
             schema:
               type: object
       responses:
-        default:
+        '200':
           description: Successful operation
   /user/{id}:
     get:
       tags:
         - user
+        - trainSearch
+      security:
+        - bearerAuth: [ ]
       summary: Get user by id
-      description: ''
+      description: "The endpoint resides on the user service, but trainSearch proxies the same endpoint to the user service for authentication.
+      The user service is not protected, only the external trainSearch proxy is."
       operationId: getUserById
       parameters:
         - name: id
           in: path
-          description: 'The id of the user that needs to be fetched.'
+          description: The id of the user that needs to be fetched.
           required: true
           schema:
             type: integer
@@ -782,9 +1094,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/UserPublic'
         '400':
           description: Invalid id supplied
+        '401':
+          description: Unauthorized - no JWT token was found inside the request Authorization header
+        '403':
+          description: Forbidden - the JWT token was found but it is invalid or does not match the requesting user id
         '404':
           description: User not found
     put:
@@ -832,10 +1148,145 @@ paths:
           description: Invalid id supplied
         '404':
           description: User not found
-
-
+  /user/{id}/topup:
+    post:
+      tags:
+        - user
+        - trainSearch
+      security:
+        - bearerAuth: [ ]
+      summary: Top up the balance of a user
+      description: "Top up the balance of a user. The endpoint resides on the user service, but trainSearch proxies the same endpoint to the user service for authentication.
+      The user service is not protected, only the external trainSearch proxy is."
+      operationId: topUpUserBalance
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      requestBody:
+        description: Amount to top up the balance of the user
+        content:
+          text/plain:
+            schema:
+              type: number
+              example: 1000
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - no JWT token was found inside the request Authorization header
+        '403':
+          description: Forbidden - the JWT token was found but it is invalid or does not match the requesting user id
+        '404':
+          description: User not found
+  /user/{id}/deduct:
+    post:
+      tags:
+        - user
+        - trainSearch
+      security:
+        - bearerAuth: [ ]
+      summary: Deduct from the balance of a user
+      description: "Deduct from the balance of a user. The endpoint resides on the user service, but trainSearch proxies the same endpoint to the user service for authentication.
+        The user service is not protected, only the external trainSearch proxy is."
+      operationId: deductUserBalance
+      parameters:
+        - name: id
+          in: path
+          description: ID of the user that needs to be updated
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 10
+      requestBody:
+        description: Amount to deduct the balance of the user with
+        content:
+          text/plain:
+            schema:
+              type: number
+              example: 1000
+      responses:
+        '200':
+          description: Successful operation
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized - no JWT token was found inside the request Authorization header
+        '403':
+          description: Forbidden - the JWT token was found but it is invalid or does not match the requesting user id
+        '404':
+          description: User not found
 components:
   schemas:
+    Route:
+      required:
+        - journeys
+      type: object
+      properties:
+        journeys:
+          type: array
+          items:
+            $ref: '#/components/schemas/Journey'
+        totalPrice:
+          type: number
+          description: Total price of the route (computed automatically from journeys)
+          example: 31.99
+        totalDuration:
+          type: integer
+          format: int32
+          description: Total duration of the route in minutes (computed automatically from journeys)
+          example: 120
+    Operator:
+      required:
+        - id
+        - name
+        - balance
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+          minimum: 0
+        name:
+          type: string
+          example: NS
+        balance:
+          type: number
+          description: Bank account balance of the operator
+          example: 12331.33
+    UserPublic:
+      type: object
+      description: User object without sensitive information
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 10
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: James
+        email:
+          type: string
+          example: john@email.com
+        phone:
+          type: string
+          example: '+40770312595'
+        balance:
+          type: number
+          description: In-account credit balance for buying tickets
+          example: 121.33
     User:
       type: object
       properties:
@@ -892,6 +1343,7 @@ components:
         - travel_time
         - price
         - occupied_seats
+        - blocked_seats
       type: object
       properties:
         id:
@@ -957,7 +1409,6 @@ components:
           description: Total price of the journeys listed in the booking
     Ticket:
       required:
-        - id
         - user_id
         - booking_id
         - isValid
@@ -985,9 +1436,9 @@ components:
           description: Validity of the ticket. Can be invalidated if a BProcess demands it.
     Payment:
       required:
-        - id
         - user_id
         - booking_id
+        - paymentMethod
         - isSuccess
       type: object
       properties:
@@ -1006,7 +1457,39 @@ components:
           format: int64
           example: 69
           minimum: 0
+        paymentMethod:
+          type: string
+          anyOf:
+            - type: string
+              enum: [debit, ideal]
         isSuccess:
           type: boolean
           example: true
           default: false
+    LoginRequest:
+      required:
+        - email
+        - password
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: john.doe@gmail.com
+        password:
+          type: string
+          example: 'VeryStrongPassword123!'
+    LoginResponse:
+      required:
+        - token
+        - userId
+      type: object
+      properties:
+        token:
+          type: string
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0NTY3ODkwIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+        userId:
+          type: integer
+          format: int32
+          example: 10
+          minimum: 0

@@ -21,7 +21,7 @@ spec:
         io.kompose.service: mailhog
     spec:
       containers:
-        - image: mailhog/mailhog
+        - image: mailhog/mailhog:v1.0.1
           name: mailhog
           ports:
             - containerPort: 1025

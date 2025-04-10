@@ -65,10 +65,16 @@ This section outlines the steps to deploy the application using Kubernetes with 
 
 ### 1. Start Minikube
 
-Start a local Kubernetes cluster using Minikube:
+Start a local Kubernetes cluster using Minikube with default parameters:
 
 ```bash
 minikube start
+```
+
+You can also specify the number of CPU cores and memory size for Minikube:
+
+```bash
+minikube start --cpus 2 --memory 4096
 ```
 
 ### 2. Configure Docker Environment

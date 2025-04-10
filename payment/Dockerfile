@@ -1,5 +1,5 @@
 # Start with a base image containing Java runtime
-FROM amazoncorretto:21
+FROM alpine/java:21-jre
 
 # Add Maintainer Info
 LABEL maintainer="group21"

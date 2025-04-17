@@ -8,6 +8,7 @@ metadata:
     io.kompose.service: train-search
   name: train-search
 spec:
+  type: NodePort
   ports:
     - name: "8089"
       port: 8089

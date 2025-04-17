@@ -38,17 +38,12 @@ public class JourneySpecification {
                         : cb.equal(root.get(ARRIVAL_STATION), arrivalStation);
     }
 
-    private static Specification<Journey> hasDepartureTime(LocalDateTime departureTime) {
-        return (root, query, cb) ->
-                (departureTime == null)
-                        ? cb.conjunction()
-                        : cb.equal(root.get(DEPARTURE_TIME), departureTime);
-    }
-
     private static Specification<Journey> hasDepartureTimeGreaterThanOrEqualTo(LocalDateTime departureTime) {
-        return (root, query, cb) ->
-                (departureTime == null)
-                    ? cb.conjunction()
-                    : cb.greaterThanOrEqualTo(root.get(DEPARTURE_TIME), departureTime);
+        return (root, query, cb) -> {
+            if (departureTime == null) {
+                return cb.conjunction();
+            }
+            return cb.greaterThanOrEqualTo(root.<LocalDateTime>get(DEPARTURE_TIME), departureTime);
+        };
     }
 }

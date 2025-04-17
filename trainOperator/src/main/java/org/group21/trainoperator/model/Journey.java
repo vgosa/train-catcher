@@ -30,7 +30,7 @@ public class Journey {
     @NotBlank
     private String arrivalStation;
 
-    @Column(name = "departure_time", nullable = false)
+    @Column(name = "departure_time", nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime departureTime;
 
     @Column(name = "travel_time", nullable = false)

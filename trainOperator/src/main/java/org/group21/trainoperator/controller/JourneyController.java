@@ -35,6 +35,7 @@ public class JourneyController {
 
         // For now, we ignore isDelayed as it's not implemented.
         List<Journey> journeys = journeyService.getFilteredJourneys(departureStation, arrivalStation, departureTime);
+        journeys.forEach(journey -> log.info(journey.getDepartureTime().toString()));
         return ResponseEntity.ok(journeys);
     }
 

@@ -177,7 +177,7 @@ paths:
             example: 2025-03-05T11:59:19.845Z
         - name: isDelayed
           in: query
-          description: Delayed status that needs to be considered for filter
+          description: Delayed status that needs to be considered for filter - NOT IN USE
           required: false
           schema:
             type: boolean
@@ -319,7 +319,7 @@ paths:
         '404':
           description: Journey not found
         '409':
-          description: Could not block seat because of the current state of the journey
+          description: Could not block seat because of the current state of the journey (i.e. All seats are occupied)
   /journey/{journeyId}/confirm:
     post:
       tags:
@@ -344,7 +344,7 @@ paths:
         '404':
           description: Journey not found
         '409':
-          description: Could not confirm seat because of the current state of the journey
+          description: Could not confirm seat because of the current state of the journey (i.e. No seat is blocked for the user)
   /journey/{journeyId}/cancel:
     post:
       tags:
@@ -369,7 +369,7 @@ paths:
         '404':
           description: Journey not found
         '409':
-          description: Could not cancel the seat reservation because of the current state of the journey
+          description: Could not cancel the seat reservation because of the current state of the journey (i.e. The seat is already confirmed)
   /operator:
     get:
       tags:
@@ -445,6 +445,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
         '400':
           description: Invalid input
         '404':
@@ -474,6 +478,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Operator'
         '400':
           description: Invalid input
         '404':
@@ -543,7 +551,9 @@ paths:
       tags:
         - trainSearch
       summary: Register a new operator in the train search system
-      description: Register a new operator in the train search system
+      description: "Registers a new operator in the TrainSearch instance and adds it to the list of registered operators.
+      The current implementation adds state to the TrainSearch instance (local scheduler), but it should be stateless (remote scheduler) - i.e.
+      use Consul Key/Value store or Kubernetes stateful set, or Redis Cache microservice."
       operationId: registerOperator
       requestBody:
           description: Operator entity to register
@@ -1178,6 +1188,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+           application/json:
+             schema:
+              $ref: '#/components/schemas/UserPublic'
         '400':
           description: Invalid input
         '401':
@@ -1216,6 +1230,10 @@ paths:
       responses:
         '200':
           description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPublic'
         '400':
           description: Invalid input
         '401':
@@ -1379,6 +1397,11 @@ components:
           type: integer
           format: int32
           example: 32
+          minimum: 0
+        blocked_seats:
+          type: integer
+          format: int32
+          example: 10
           minimum: 0
     Booking:
       required:

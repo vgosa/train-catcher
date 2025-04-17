@@ -12,9 +12,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -54,9 +52,12 @@ public class TrainSearchService {
                 log.info("Operator {} is inactive, skipping...", operator.getName());
                 continue;
             }
-            String url = operator.getUrl() + OperatorService.OPERATOR_JOURNEY_ENDPOINT; // no filters appended
+
             try {
-                Journey[] journeys = restTemplate.getForObject(url, Journey[].class);
+                final Map<String, String> variables = new HashMap<>();
+                variables.put("departureTime", departureTime.toString());
+                Journey[] journeys = restTemplate.getForObject(operator.getUrl() + OperatorService.OPERATOR_JOURNEY_ENDPOINT +"?departure_time={departureTime}",
+                        Journey[].class, variables);
                 for (Journey journey : Objects.requireNonNull(journeys)) {
                     journey.setOperator(operator);
                     allJourneys.add(journey);

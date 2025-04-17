@@ -100,6 +100,9 @@
             const user = await resp.json();
             document.getElementById("userInfo").innerText =
                 `Welcome, ${user.firstName} ${user.lastName} — Balance: ${new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' }).format(user.balance)}`;
+        } else {
+            console.error("Failed to load user info. Please log in again.");
+            logout();
         }
     }
     loadUserInfo();

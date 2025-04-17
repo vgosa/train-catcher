@@ -116,6 +116,10 @@
                     currency: 'EUR'
                 }).format(user.balance)}`;
         }
+        else {
+            console.error("Failed to load user info. Please log in again.");
+            logout();
+        }
     }
 
     loadUserInfo();

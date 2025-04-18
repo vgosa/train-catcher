@@ -20,8 +20,8 @@ public class JourneySpecification {
     public static Specification<Journey> filterBy(JourneyFilter filter) {
         return Specification
                 .where(hasDepartureStation(filter.getDepartureStation()))
-                .and(hasArrivalStation(filter.getArrivalStation()))
-                .and(hasDepartureTimeGreaterThanOrEqualTo(filter.getDepartureTime()));
+                .and(hasArrivalStation(filter.getArrivalStation()));
+//                .and(hasDepartureTimeGreaterThanOrEqualTo(filter.getDepartureTime())); // Only care about time of day, the train should run on a daily schedule.
     }
 
     private static Specification<Journey> hasDepartureStation(String departureStation) {

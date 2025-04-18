@@ -65,7 +65,7 @@
                             <td th:text="${jiter.index + 1}"></td>
                             <td th:text="${journey.departureStation}"></td>
                             <td th:text="${journey.arrivalStation}"></td>
-                            <td th:text="${journey.departureTime}"></td>
+                            <td th:text="${#temporals.format(journey.departureTime.toLocalTime(), 'HH:mm:ss')}"></td>
                             <td th:text="${journey.travelTime} + ' min'"></td>
                             <td th:text="${journey.price} + ' €'"></td>
                             <td th:text="${journey.operator.name}"></td>

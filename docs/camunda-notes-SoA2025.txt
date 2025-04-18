@@ -1,0 +1,25 @@
+* Orchestration over choreography because of three main reasons:
+	- Business Process Understanding (each task is clearly defined in a workflow and linked to a delegated executor. Non-technical people can more easily comprehend a BPMN model over a complicated net of service connections)
+	- Abstracts transaction handling (Compensation rules and messaging between executors and processes is handled internally by Camunda, thus helping developers to focus more on business logic implementation instead of complicated choreographed saga compensations using message queues).
+	- Detailed process logging (Every process instance that runs in Camunda is thoroughly logged so that developers can easily see what caused an instance to fail, or to extract valuable information such as the most called process instances).
+
+* Overhauled Camunda implementation
+BPMN Workflows are defined in code instead of Camunda Modeler. The main advantages are:
+	- Git versioning of process definitions (multiple people can work on the same processes, versions can be rolled back if something goes wrong)
+	- Business logic code is directly translated into BPMN models (developers only need to code, business people only need to read BPMN diagrams, everyone is happy!)
+
+* How do we use Camunda?
+To ensure that our system is scalable, we integrated the Camunda engine into our main microservice (trainSearch). This implies that each deployment of our train search application contains its own engine, which brings the following advantages over a single Camunda deployment:
+	- Camunda can now be load balanced
+	- Processes are isolated
+	- High availability (train search can never be down and Camunda up, or the other way around).
+
+* Orchestrated SAGAs
+	- Ticket Booking
+		o Saga for booking train seats for all train operators.
+	- Ticket Payment
+		o Saga for checking user balances and distributing the price of the ticket between all the operators in a route.
+	- Ticket Order workflow
+		o Main saga for ordering tickets. Uses the booking and payments sagas as sub-processes.
+
+

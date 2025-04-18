@@ -1,8 +1,9 @@
 # Train-Catcher: The Train Catching App
 
+## Development Environment Setup
 ## Pre-requisites:
 
-- Java 17
+- Java 21
 - Docker
 
 ## Running the application:
@@ -53,7 +54,7 @@ http://localhost:<trainSearch_port>/camunda
 
 ---
 
-## OPENApi Documentation
+## OpenAPI Documentation
 
 The API documentation can be accessed [here](https://vgosa.github.io/train-catcher/).
 
@@ -151,3 +152,39 @@ minikube service mailhog --url
 ```
 
 These commands will output the accessible URLs for the services running inside your Minikube cluster.
+
+## Kubernetes Cluster Description
+
+The cluster consists of 12 deployments and 5 services, each serving a specific purpose. The services are designed to work together to provide a seamless experience for users searching and booking train tickets. Below is a brief description of each component in the cluster:
+
+### 1. Deployments
+- **train-search**: The main service for searching and booking train tickets.
+- **train-operator**: Manages train operations and schedules. Each independent train operator has its own deployment (by default, 1 and 2 represent NS and Arriva).
+- **user**: Manages user accounts and in-app balances.
+- **booking**: Handles booking operations and interactions with the train-search service.
+- **notification**: Manages notifications and email sending (sends tickets to users).
+- **payment**: Handles payment operations (mostly persists payments to the database for auditing).
+- **ticket**: Manages ticket creation and auditing.
+- **activemq**: The message broker for handling emails (ticket service -> notification service -> mailhog).
+- **nginx**: The reverse proxy and API gateway for the application. It secures the internal services and only exposes the necessary endpoints to the outside world. (train search only)
+- **consul**: The service discovery tool for the application. It allows services to discover each other and communicate with static hostnames.
+- **mailhog**: The email testing tool for capturing outgoing emails. It provides a web interface to view the emails sent by the application.
+
+### 2. Services
+- **train-search**: Exposes the train-search service to the outside world. It is accessible by declaring a service with NodePort type.
+- **nginx**: Exposes the nginx service to the outside world. It is accessible by declaring a service with NodePort type. (for debugging purposes)
+- **consul**: Exposes the consul service to the outside world. It is accessible by declaring a service with NodePort type. (for debugging purposes)
+- **mailhog**: Exposes the mailhog service to the outside world. It is accessible by declaring a service with NodePort type. (for email mocking)
+- **activemq**: Exposes the activemq service to the outside world. It is accessible by declaring a service with NodePort type. (for debugging purposes)
+
+### 3. ConfigMaps
+- **trainoperator-instances**: Since we want to differentiate between train operators, we need to set up a config map that contains the train operator instances. This is used by the train-operator service to differentiate between the different train operators. The default values are 1 and 2, which represent NS and Arriva respectively. (in development they are managed with local SpringBoot configuration files for instance1, instance2, etc.)
+- **nginx-config**: The nginx configuration file for the nginx service. It is used to configure the reverse proxy and API gateway for the application.
+
+### 4. Persistent Volumes
+- **train-operator-data**: Our application uses H2 in-memory databases for the services. However, we need to persist the data for the train-operator service. This is done by creating a persistent volume that is mounted to the train-operator service. The default values are 1 and 2, which represent NS and Arriva respectively. (in development they are managed with local SpringBoot configuration files for instance1, instance2, etc.)
+
+
+
+
+
